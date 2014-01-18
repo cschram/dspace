@@ -5,8 +5,8 @@
         "dsfml:audio": "~master"
     },
     "buildTypes": {
-    	"release": {
-    		"lflags-windows": ["-L/exet:nt/su:windows"]
-    	}
+        "release": {
+            "lflags-windows": ["-L/exet:nt/su:windows"]
+        }
     }
 }
