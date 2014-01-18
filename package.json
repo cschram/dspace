@@ -1,0 +1,12 @@
+{
+    "name": "dspace",
+    "dependencies": {
+        "dsfml:graphics": "~master",
+        "dsfml:audio": "~master"
+    },
+    "buildTypes": {
+    	"release": {
+    		"lflags-windows": ["-L/exet:nt/su:windows"]
+    	}
+    }
+}

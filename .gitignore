@@ -1,0 +1,9 @@
+.dub/
+lib/
+dspace
+*.exe
+*.dll
+*.lib
+*.so
+*.so.2
+*.so.2.0
