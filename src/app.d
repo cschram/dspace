@@ -3,7 +3,7 @@ import std.stdio;
 import game;
 
 void main() {
-    writeln("Starting Game...");
-    Game.GetInstance().Run();
-    writeln("Exiting...");
+  writeln("Starting Game...");
+  Game.GetInstance().Run();
+  writeln("Exiting...");
 }
