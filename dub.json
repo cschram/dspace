@@ -6,6 +6,7 @@
   "license": "MIT",
 	"dependencies": {
     "dsfml:graphics": "~master",
-    "dsfml:audio": "~master"
+    "dsfml:audio": "~master",
+    "artemisd": "~master"
 	}
 }
