@@ -10,6 +10,7 @@ import artemisd.all;
 import dspace.resources;
 import dspace.components.dimensions;
 import dspace.components.entitysprite;
+import dspace.components.spritesheet;
 import dspace.components.velocity;
 import dspace.systems.movement;
 import dspace.systems.render;
@@ -82,10 +83,12 @@ public:
         player            = world.createEntity();
         auto playerDim    = new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61));
         auto playerVel    = new Velocity(true);
-        auto playerSprite = resources.getSprite("content/images/ship-idle.png");
+        //auto playerSprite = resources.getSprite("content/images/ship-idle.png");
+        auto playerSprite = resources.getSprite("content/images/ship-bank-left.png");
         player.addComponent(playerDim);
         player.addComponent(playerVel);
-        player.addComponent(new EntitySprite(playerSprite));
+        //player.addComponent(new EntitySprite(playerSprite));
+        player.addComponent(new SpriteSheet(playerSprite, Vector2i(55, 61), 3));
         player.addToWorld();
 
         float backgroundPosition = 1800;
