@@ -1,6 +1,9 @@
 module dspace.game;
 
 import std.stdio;
+import std.conv;
+import std.string;
+import core.memory;
 
 import dsfml.graphics;
 import dsfml.audio;
@@ -10,99 +13,122 @@ import artemisd.all;
 import dspace.resources;
 import dspace.components.dimensions;
 import dspace.components.entitysprite;
+import dspace.components.entitystate;
 import dspace.components.spritesheet;
 import dspace.components.velocity;
 import dspace.systems.movement;
 import dspace.systems.render;
 
 class Game {
-public:
+
+    //
     // Constants
-    static float     scrollSpeed = 0.5;
-    static VideoMode screenMode  = VideoMode(400, 600);
-    static float     playerSpeed = 250;
+    //
 
-private:
+    public static immutable(VideoMode) screenMode  = VideoMode(400, 600);
+    public static immutable(float)     scrollSpeed = 0.5;
+    public static immutable(float)     playerSpeed = 250;
 
-    static Game _instance;
+    //
+    // Private Variables
+    //
+
+    private static Game _instance;
 
     // State
-    RenderWindow    window;
-    ResourceManager resources;
-    World           world;
-    bool            started;
-    bool            moving;
-    Entity          player;
+    private RenderWindow    window;
+    private ResourceManager resources;
+    private World           world;
+    private bool            started;
+    private bool            moving;
+    private Entity          player;
+    private int             score;
 
-    this() {
+    //
+    // Private Methods
+    //
+
+    private this() {
+        GC.disable();
         resources = new ResourceManager();
     }
 
-public:
+    //
+    // Public Methods
+    //
 
-    static Game getInstance() {
+    public static Game getInstance() {
         if (_instance is null) {
             _instance = new Game();
         }
         return _instance;
     }
 
-    RenderWindow getWindow() {
+    public RenderWindow getWindow() {
         return window;
     }
 
-    ResourceManager getResources() {
+    public ResourceManager getResources() {
         return resources;
     }
 
-    World getWorld() {
+    public World getWorld() {
         return world;
     }
 
-    Entity getPlayer() {
+    public Entity getPlayer() {
         return player;
     }
 
-    void run() {
+    public void run() {
         writeln("Loading...");
 
         started = false;
         moving  = false;
+        score   = 0;
+
+        float backgroundPosition = 1800;
 
         // Setup window
-        window  = new RenderWindow(screenMode, "DSpace");
+        window = new RenderWindow(screenMode, "DSpace");
         window.setFramerateLimit(60);
 
         // Setup world
         world = new World();
         world.setSystem(new MovementSystem);
         world.setSystem(new RenderSystem);
+        auto groupManager = new GroupManager;
+        auto tagManager   = new TagManager;
+        world.setManager(groupManager);
+        world.setManager(tagManager);
         world.initialize();
 
         // Setup player
-        player            = world.createEntity();
-        auto playerDim    = new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61));
-        auto playerVel    = new Velocity(true);
-        //auto playerSprite = resources.getSprite("content/images/ship-idle.png");
-        auto playerSprite = resources.getSprite("content/images/ship-bank-left.png");
+        player                 = world.createEntity();
+        auto playerDim         = new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61));
+        auto playerVel         = new Velocity(true);
+        auto playerState       = new EntityState(10);
+        auto playerSprite      = resources.getSprite("content/images/ship.png");
+        auto playerSpriteSheet = new SpriteSheet(playerSprite, Vector2i(55, 61), 3);
         player.addComponent(playerDim);
         player.addComponent(playerVel);
-        //player.addComponent(new EntitySprite(playerSprite));
-        player.addComponent(new SpriteSheet(playerSprite, Vector2i(55, 61), 3));
+        player.addComponent(playerState);
+        player.addComponent(playerSpriteSheet);
         player.addToWorld();
 
-        float backgroundPosition = 1800;
-
         // Images
-        auto background = resources.getSprite("content/images/background.png");
-        auto healthbar  = resources.getSprite("content/images/healthbar.png");
-        auto gameover   = resources.getSprite("content/images/gameover.png");
+        auto background        = resources.getSprite("content/images/background.png");
+        auto healthbar         = resources.getSprite("content/images/healthbar.png");
+        auto gameover          = resources.getSprite("content/images/gameover.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
+        gameover.color         = Color(255, 255, 255, 200);
 
         // Text
-        auto font = resources.getFont("content/fonts/slkscr.ttf");
-        auto startText = new Text("Press Space to Start", font, 30);
+        auto font          = resources.getFont("content/fonts/slkscr.ttf");
+        auto startText     = new Text("Press Space to Start", font, 30);
+        auto scoreText     = new Text("Score: 0", font, 13);
         startText.position = Vector2f(8, 270);
+        scoreText.position = Vector2f(2, 10);
 
         // Main loop
         writeln("Running...");
@@ -139,8 +165,11 @@ public:
             // Game logic
             if (started) {
                 if (moving) {
-                    backgroundPosition -=  scrollSpeed;
-                    background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
+                    backgroundPosition -= scrollSpeed;
+                    // Avoiding creating a new IntRect every loop iteration
+                    auto updatedRect = background.textureRect;
+                    updatedRect.top = cast(int)backgroundPosition;
+                    background.textureRect = updatedRect;
                     moving = (backgroundPosition > 0);
                 }
 
@@ -161,6 +190,16 @@ public:
             if (started) {
                 world.setDelta(1/60.0f);
                 world.process();
+
+                // UI
+                if (playerState.health > 0) {
+                    healthbar.textureRect = IntRect(0, 0, 8 * playerState.health, 8);
+                    window.draw(healthbar);
+                } else {
+                    window.draw(gameover);
+                }
+                scoreText.setString(to!dstring(format("Score: %s", score)));
+                window.draw(scoreText);
             } else {
                 window.draw(startText);
             }
@@ -169,8 +208,12 @@ public:
         }
     }
 
-    bool hasStarted() {
+    public bool hasStarted() {
         return started;
+    }
+
+    public void addScore(int amt) {
+        score += amt;
     }
 
 }
