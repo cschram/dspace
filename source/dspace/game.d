@@ -49,7 +49,6 @@ class Game {
     //
 
     private this() {
-        GC.disable();
         resources = new ResourceManager();
     }
 
@@ -129,6 +128,8 @@ class Game {
         auto scoreText     = new Text("Score: 0", font, 13);
         startText.position = Vector2f(8, 270);
         scoreText.position = Vector2f(2, 10);
+
+        GC.collect();
 
         // Main loop
         writeln("Running...");
