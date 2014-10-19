@@ -33,7 +33,8 @@ class Game {
     // Private Variables
     //
 
-    private static Game _instance;
+    __gshared Game _instance;
+    static bool _instantiated;
 
     // State
     private RenderWindow    window;
@@ -57,8 +58,13 @@ class Game {
     //
 
     public static Game getInstance() {
-        if (_instance is null) {
-            _instance = new Game();
+        if (!_instantiated) {
+            synchronized {
+                if (_instance is null) {
+                    _instance = new Game;
+                }
+                _instantiated = true;
+            }
         }
         return _instance;
     }
@@ -133,7 +139,10 @@ class Game {
 
         // Main loop
         writeln("Running...");
+        auto clock = new Clock();
         while (window.isOpen()) {
+            clock.restart();
+
             // Poll events
             Event e;
             while (window.pollEvent(e)) {
@@ -206,6 +215,11 @@ class Game {
             }
 
             window.display();
+
+            auto t = clock.getElapsedTime().asMilliseconds();
+            if (t > 16) {
+                //writeln("Frame took ", t, "ms");
+            }
         }
     }
 
