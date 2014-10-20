@@ -3,13 +3,9 @@ module dspace.game;
 import std.stdio;
 import std.conv;
 import std.string;
-import core.memory;
-
 import dsfml.graphics;
 import dsfml.audio;
-
 import artemisd.all;
-
 import dspace.resources;
 import dspace.components.dimensions;
 import dspace.components.entitysprite;
@@ -113,7 +109,7 @@ class Game {
         auto playerDim         = new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61));
         auto playerVel         = new Velocity(true);
         auto playerState       = new EntityState(10);
-        auto playerSprite      = resources.getSprite("content/images/ship.png");
+        auto playerSprite      = resources.getSprite("images/ship.png");
         auto playerSpriteSheet = new SpriteSheet(playerSprite, Vector2i(55, 61), 3);
         player.addComponent(playerDim);
         player.addComponent(playerVel);
@@ -122,27 +118,22 @@ class Game {
         player.addToWorld();
 
         // Images
-        auto background        = resources.getSprite("content/images/background.png");
-        auto healthbar         = resources.getSprite("content/images/healthbar.png");
-        auto gameover          = resources.getSprite("content/images/gameover.png");
+        auto background        = resources.getSprite("images/background.png");
+        auto healthbar         = resources.getSprite("images/healthbar.png");
+        auto gameover          = resources.getSprite("images/gameover.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
         gameover.color         = Color(255, 255, 255, 200);
 
         // Text
-        auto font          = resources.getFont("content/fonts/slkscr.ttf");
+        auto font          = resources.getFont("fonts/slkscr.ttf");
         auto startText     = new Text("Press Space to Start", font, 30);
         auto scoreText     = new Text("Score: 0", font, 13);
         startText.position = Vector2f(8, 270);
         scoreText.position = Vector2f(2, 10);
 
-        GC.collect();
-
         // Main loop
         writeln("Running...");
-        auto clock = new Clock();
         while (window.isOpen()) {
-            clock.restart();
-
             // Poll events
             Event e;
             while (window.pollEvent(e)) {
@@ -215,11 +206,6 @@ class Game {
             }
 
             window.display();
-
-            auto t = clock.getElapsedTime().asMilliseconds();
-            if (t > 16) {
-                //writeln("Frame took ", t, "ms");
-            }
         }
     }
 

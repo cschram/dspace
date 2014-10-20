@@ -5,9 +5,9 @@ import dsfml.graphics;
 import dspace.components.entitysprite;
 
 class SpriteSheet : EntitySprite {
-    Vector2i spriteSize;
-    int      spriteCount;
-    int      currentSprite;
+    private Vector2i spriteSize;
+    private int      spriteCount;
+    private int      currentSprite;
 
     this(Sprite sprite, Vector2i size, int index=0) {
         super(sprite);

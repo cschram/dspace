@@ -19,7 +19,7 @@ class RenderSystem : EntityProcessingSystem {
         auto sprite = e.getComponent!EntitySprite;
         auto dim    = e.getComponent!Dimensions;
         if (sprite.prepareRender(dim.position)) {
-            window.draw(sprite.sprite);
+            window.draw(sprite.getSprite());
         }
     }
 }

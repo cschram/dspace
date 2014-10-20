@@ -1,6 +1,7 @@
 .dub/
+dub.selections.json
 /lib/
-/dspace
+/bin/dspace
 *.exe
 *.dll
 *.lib

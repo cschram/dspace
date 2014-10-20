@@ -6,10 +6,14 @@ import artemisd.all;
 class EntitySprite : Component {
     mixin TypeDecl;
 
-    Sprite sprite;
+    protected Sprite sprite;
 
     this(Sprite sprite) {
         this.sprite = sprite;
+    }
+
+    Sprite getSprite() {
+        return sprite;
     }
 
     bool prepareRender(Vector2f position) {

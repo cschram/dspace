@@ -3,10 +3,13 @@
 	"description": "Simple space shmup game written in D.",
 	"copyright": "Copyright © 2014, Corey Schram",
 	"authors": [ "Corey Schram" ],
-  "license": "MIT",
+    "license": "MIT",
+    "targetPath": "bin",
+    "lflags-windows-x86": [ "+lib\\x86\\windows\\" ],
+    "lflags-linux-x86_64": [ "-L./lib/x86_64/linux/" ],
 	"dependencies": {
-    "dsfml:graphics": "~master",
-    "dsfml:audio": "~master",
-    "artemisd": "~master"
+        "dsfml:graphics": "~master",
+        "dsfml:audio": "~master",
+        "artemisd": "~master"
 	}
 }
