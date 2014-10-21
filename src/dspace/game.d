@@ -7,6 +7,7 @@ import dsfml.graphics;
 import dsfml.audio;
 import artemisd.all;
 import dspace.resources;
+import dspace.states;
 import dspace.components.dimensions;
 import dspace.components.entitysprite;
 import dspace.components.entitystate;
@@ -35,6 +36,7 @@ class Game {
     // State
     private RenderWindow    window;
     private ResourceManager resources;
+    private StateMachine    states;
     private World           world;
     private bool            started;
     private bool            moving;
@@ -47,6 +49,13 @@ class Game {
 
     private this() {
         resources = new ResourceManager();
+        states    = new StateMachine();
+        //states.addState(new State(
+        //    "test",
+        //    ["test2"],
+        //    delegate() { writeln("test"); },
+        //    delegate(string name) { return true; }
+        //));
     }
 
     //
@@ -162,6 +171,8 @@ class Game {
                         break;
                 }
             }
+
+            states.update();
 
             // Game logic
             if (started) {
