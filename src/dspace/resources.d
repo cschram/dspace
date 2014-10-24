@@ -11,14 +11,17 @@ import dspace.animation;
 // Responsible for all file system IO. Currently just does a straight read,
 // but should eventually pool/cache results.
 //
-class ResourceManager {
+class ResourceManager
+{
 
-    private const(string) mergePath(const(string) name) {
+    private const(string) mergePath(const(string) name)
+    {
         return "content/" ~ name;
     }
 
 
-    public Sprite getSprite(const(string) name) {
+    public Sprite getSprite(const(string) name)
+    {
         auto tex = new Texture();
         if (!tex.loadFromFile(mergePath(name))) {
             throw new Exception("Could not load Sprite '" ~ name ~ "'.");
@@ -29,7 +32,8 @@ class ResourceManager {
     public void releaseSprite(const(string) name) { }
 
 
-    public Font getFont(const(string) name) {
+    public Font getFont(const(string) name)
+    {
         auto font = new Font();
         if (!font.loadFromFile(mergePath(name))) {
             throw new Exception("Could not load Font '" ~ name ~ "'.");
@@ -40,7 +44,8 @@ class ResourceManager {
     public void releaseFont(const(string) name) { }
 
 
-    public Sound getSound(const(string) name) {
+    public Sound getSound(const(string) name)
+    {
         auto buf = new SoundBuffer();
         if (!buf.loadFromFile(mergePath(name))) {
             throw new Exception("Could not load Sound '" ~ name ~ "'.");
@@ -51,14 +56,16 @@ class ResourceManager {
     public void releaseSound(const(string) name) { }
 
 
-    public JSONValue getJSON(const(string) name) {
+    public JSONValue getJSON(const(string) name)
+    {
         return parseJSON(readText(mergePath(name)));
     }
 
     public void releaseJSON(const(string) name) { }
 
 
-    public Animation getAnimation(const(string) name) {
+    public Animation getAnimation(const(string) name)
+    {
         auto json = getJSON(name);
         auto sprite = getSprite(json.object["sprites"].str);
         return new Animation(sprite, json);

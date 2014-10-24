@@ -7,7 +7,8 @@ import dsfml.graphics;
 import dspace.game;
 import dspace.spritesheet;
 
-class Animation {
+class Animation
+{
 
     private ushort[]    frames;
     private Sprite      sprite;
@@ -18,7 +19,8 @@ class Animation {
     private ushort      ticks;
     private ushort      frame;
 
-    public this(Sprite _sprite, JSONValue config) {
+    public this(Sprite _sprite, JSONValue config)
+    {
         sprite = _sprite;
         size = Vector2i(
             to!int(config.object["width"].integer),
@@ -41,11 +43,13 @@ class Animation {
         }
     }
 
-    public Sprite getSprite() {
+    public Sprite getSprite()
+    {
         return sprite;
     }
 
-    public bool tick(ushort numTicks) {
+    public bool tick(ushort numTicks)
+    {
         ticks += numTicks;
 
         if (ticks > frames[frame]) {
@@ -66,11 +70,13 @@ class Animation {
         return false;
     }
 
-    public bool isPlaying() {
+    public bool isPlaying()
+    {
         return !finished;
     }
 
-    public void restart() {
+    public void restart()
+    {
         ticks = 0;
         frame = 0;
         finished = false;

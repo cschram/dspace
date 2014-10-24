@@ -6,14 +6,17 @@ import dspace.game;
 import dspace.components.dimensions;
 import dspace.components.velocity;
 
-class MovementSystem : EntityProcessingSystem {
+class MovementSystem : EntityProcessingSystem
+{
     mixin TypeDecl;
 
-    this() {
+    this()
+    {
         super(Aspect.getAspectForAll!(Dimensions, Velocity));
     }
 
-    override void process(Entity e) {
+    override void process(Entity e)
+    {
         auto dim = e.getComponent!Dimensions;
         auto vel = e.getComponent!Velocity;
 

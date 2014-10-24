@@ -6,6 +6,6 @@ void main() {
     try {
         Game.getInstance().run();
     } catch(Exception e) {
-        writeln("Uncatch error, %s, exiting.", e);
+        writeln("Uncaught error, %s, exiting.", e);
     }
 }
