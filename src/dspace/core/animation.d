@@ -1,11 +1,11 @@
-module dspace.animation;
+module dspace.core.animation;
 
 import std.conv;
 import std.json;
 import dsfml.system;
 import dsfml.graphics;
 import dspace.game;
-import dspace.spritesheet;
+import dspace.core.spritesheet;
 
 class Animation
 {

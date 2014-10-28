@@ -1,8 +1,8 @@
-module dspace.quadtree;
+module dspace.core.quadtree;
 
 import std.algorithm;
 import dsfml.graphics;
-import dspace.entity;
+import dspace.core.entity;
 
 class QuadTree
 {

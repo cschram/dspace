@@ -7,35 +7,27 @@ import dsfml.graphics;
 import dsfml.audio;
 
 import dspace.resources;
-import dspace.statemachine;
-import dspace.quadtree;
+import dspace.core.statemachine;
+import dspace.core.quadtree;
 
 import dspace.states.gamestate;
 import dspace.states.game.gameover;
 import dspace.states.game.playing;
 import dspace.states.game.startmenu;
 
-import dspace.entity;
+import dspace.core.entity;
 import dspace.entities.player;
 
 class Game
 {
 
-    //
-    // Constants
-    //
-
-    static immutable(VideoMode) screenMode  = VideoMode(400, 600);
-    static immutable(float)     scrollSpeed = 0.5;
-
-    //
-    // Private Variables
-    //
+    static immutable(VideoMode) screenMode    = VideoMode(400, 600);
+    static immutable(short)     scrollSpeed   = 30;
+    static immutable(float)     cacheInterval = 1.0f;
 
     private __gshared Game _instance;
     private static bool _instantiated;
 
-    // State
     private RenderWindow    window;
     private ResourceManager resourceMgr;
     private StateMachine    states;
@@ -48,10 +40,6 @@ class Game
     private int             score              = 0;
     private float           backgroundPosition = 1000;
     private bool            scrolling          = false;
-
-    //
-    // Private Methods
-    //
 
     private this()
     {
@@ -66,11 +54,10 @@ class Game
     private bool update(float delta)
     {
         if (scrolling) {
-            backgroundPosition -= scrollSpeed;
-            // Avoiding creating a new IntRect every loop iteration
-            auto updatedRect = background.textureRect;
-            updatedRect.top = cast(int)backgroundPosition;
-            background.textureRect = updatedRect;
+            backgroundPosition -= scrollSpeed * delta;
+            auto rect = background.textureRect;
+            rect.top = cast(int)backgroundPosition;
+            background.textureRect = rect;
             scrolling = (backgroundPosition > 0);
         }
 
@@ -85,10 +72,6 @@ class Game
         state.render(window);
         window.display();
     }
-
-    //
-    // Public Methods
-    //
 
     static Game getInstance()
     {
@@ -144,6 +127,12 @@ class Game
         return false;
     }
 
+    void startScrolling()
+    {
+        scrolling = true;
+        backgroundPosition = 1000;
+    }
+
     void run()
     {
         states.addState(new StartMenuState);
@@ -157,7 +146,6 @@ class Game
         window = new RenderWindow(screenMode, "DSpace");
         window.setFramerateLimit(60);
 
-        // Main loop
         writeln("Starting...");
 
         if (!states.transitionTo("startmenu")) {
@@ -167,9 +155,15 @@ class Game
 
         clock.restart();
         float delta = 0.0f;
+        float cacheTimer = 0.0f;
         while (window.isOpen()) {
             if (update(delta)) {
                 render();
+
+                cacheTimer -= delta;
+                if (cacheTimer <= 0.0f) {
+                    resourceMgr.collect(delta);
+                }
             } else {
                 writeln("Closing...");
                 window.close();

@@ -1,4 +1,4 @@
-module dspace.entity;
+module dspace.core.entity;
 
 import std.stdio;
 

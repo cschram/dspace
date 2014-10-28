@@ -1,4 +1,4 @@
-module dspace.statemachine;
+module dspace.core.statemachine;
 
 import std.stdio;
 

@@ -1,11 +1,12 @@
 module dspace.resources;
 
-import std.container;
+import std.stdio;
+//import std.algorithm;
 import std.file;
 import std.json;
+
 import dsfml.graphics;
 import dsfml.audio;
-import dspace.animation;
 
 
 class Resource(T)
@@ -24,11 +25,19 @@ alias Resource!(Sprite) SpriteResource;
 alias Resource!(Font)   FontResource;
 alias Resource!(Sound)  SoundResource;
 
-//
-// Resource Manager
-// Responsible for all file system IO. Currently just does a straight read,
-// but should eventually pool/cache results.
-//
+void cleanGroup(T, alias G)(uint ticks, uint maxAge)
+{
+    foreach (string name, T res; G) {
+        if (name in G) {
+            res.age += ticks;
+            if (res.age >= maxAge) {
+                writeln("Cleaning up " ~ name);
+                G.remove(name);
+            }
+        }
+    }
+}
+
 class ResourceManager
 {
 
@@ -38,15 +47,18 @@ class ResourceManager
     SpriteResource[string]    spriteCache;
     FontResource[string]      fontCache;
     SoundResource[string]     soundCache;
-    AnimationResource[string] animationCache;
 
     private const(string) mergePath(const(string) name)
     {
         return "content/" ~ name;
     }
 
-    public void clean(float delta)
+    public void collect(float delta)
     {
+        uint ticks = cast(uint)(delta * 1000);
+        cleanGroup!(SpriteResource, spriteCache)(ticks, maxAge);
+        cleanGroup!(FontResource, fontCache)(ticks, maxAge);
+        cleanGroup!(SoundResource, soundCache)(ticks, maxAge);
     }
 
 

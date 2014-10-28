@@ -1,4 +1,4 @@
-module dspace.spritesheet;
+module dspace.core.spritesheet;
 
 import dsfml.graphics;
 

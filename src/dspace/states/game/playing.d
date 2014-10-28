@@ -4,6 +4,7 @@ import std.conv;
 import std.string;
 import dsfml.graphics;
 import dspace.game;
+import dspace.core.statemachine;
 import dspace.states.gamestate;
 
 class PlayingState : GameState
@@ -18,11 +19,7 @@ class PlayingState : GameState
     this()
     {
         auto resourceMgr = Game.getInstance().getResourceMgr();
-
-        // Images
         healthbar = resourceMgr.getSprite("images/healthbar.png");
-
-        // Text
         auto font = resourceMgr.getFont("fonts/slkscr.ttf");
         scoreText = new Text("Score: 0", font, 13);
         scoreText.position = Vector2f(2, 10);
@@ -31,6 +28,13 @@ class PlayingState : GameState
     override const(string) getName() const
     {
         return name;
+    }
+
+    override bool onEnter(State previousState)
+    {
+        auto game = Game.getInstance();
+        game.startScrolling();
+        return super.onEnter(previousState);
     }
 
     override void handleInput()

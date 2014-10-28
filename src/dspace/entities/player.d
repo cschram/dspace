@@ -1,7 +1,7 @@
 module dspace.entities.player;
 
 import dsfml.graphics;
-import dspace.entity;
+import dspace.core.entity;
 import dspace.game;
 
 class Player : Entity

@@ -2,7 +2,7 @@ module dspace.states.gamestate;
 
 import dsfml.graphics;
 import dspace.game;
-import dspace.statemachine;
+import dspace.core.statemachine;
 
 class GameState : State
 {
