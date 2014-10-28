@@ -1,7 +1,7 @@
 module dspace.resources;
 
+import core.memory;
 import std.stdio;
-//import std.algorithm;
 import std.file;
 import std.json;
 
@@ -25,7 +25,8 @@ alias Resource!(Sprite) SpriteResource;
 alias Resource!(Font)   FontResource;
 alias Resource!(Sound)  SoundResource;
 
-void cleanGroup(T, alias G)(uint ticks, uint maxAge)
+// Cache collection metafunction
+void collectGroup(T, alias G)(uint ticks, uint maxAge)
 {
     foreach (string name, T res; G) {
         if (name in G) {
@@ -53,12 +54,13 @@ class ResourceManager
         return "content/" ~ name;
     }
 
+
     public void collect(float delta)
     {
         uint ticks = cast(uint)(delta * 1000);
-        cleanGroup!(SpriteResource, spriteCache)(ticks, maxAge);
-        cleanGroup!(FontResource, fontCache)(ticks, maxAge);
-        cleanGroup!(SoundResource, soundCache)(ticks, maxAge);
+        collectGroup!(SpriteResource, spriteCache)(ticks, maxAge);
+        collectGroup!(FontResource, fontCache)(ticks, maxAge);
+        collectGroup!(SoundResource, soundCache)(ticks, maxAge);
     }
 
 
