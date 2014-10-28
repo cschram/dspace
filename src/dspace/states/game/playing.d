@@ -2,71 +2,35 @@ module dspace.states.game.playing;
 
 import std.conv;
 import std.string;
-import artemisd.all;
 import dsfml.graphics;
 import dspace.game;
-import dspace.statemachine;
-import dspace.components.dimensions;
-import dspace.components.entitysprite;
-import dspace.components.entitystate;
-import dspace.components.velocity;
 import dspace.states.gamestate;
 
 class PlayingState : GameState
 {
-    private static const(string)   name        = "playing";
-    private static const(string)[] transitions = [ "gameover" ];
+    private static const(string) name = "playing";
 
-    public static immutable(float)     scrollSpeed = 0.5;
-    public static immutable(float)     playerSpeed = 250;
+    public static immutable(float) playerSpeed = 250;
 
-    private Sprite background;
     private Sprite healthbar;
     private Text   scoreText;
-    private float  backgroundPosition = 1000;
-    private bool   backgroundMoving   = true;
 
     this()
     {
-        auto resources = Game.getInstance().getResources();
+        auto resourceMgr = Game.getInstance().getResourceMgr();
 
         // Images
-        background = resources.getSprite("images/background.png");
-        healthbar = resources.getSprite("images/healthbar.png");
-        background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
+        healthbar = resourceMgr.getSprite("images/healthbar.png");
 
         // Text
-        auto font = resources.getFont("fonts/slkscr.ttf");
+        auto font = resourceMgr.getFont("fonts/slkscr.ttf");
         scoreText = new Text("Score: 0", font, 13);
         scoreText.position = Vector2f(2, 10);
     }
 
-    override const(string) getName()
+    override const(string) getName() const
     {
         return name;
-    }
-
-    override const(string)[] getTransitions()
-    {
-        return transitions;
-    }
-
-    override bool onEnter(State previousState)
-    {
-        auto game = Game.getInstance();
-        auto groupManager = game.getWorld().getManager!GroupManager;
-        auto player = game.getPlayer();
-        groupManager.add(player, "drawable");
-        return true;
-    }
-
-    override bool onExit(State nextState)
-    {
-        auto game = Game.getInstance();
-        auto groupManager = game.getWorld().getManager!GroupManager;
-        auto player = game.getPlayer();
-        groupManager.getEntities("drawable").clear();
-        return true;
     }
 
     override void handleInput()
@@ -74,75 +38,53 @@ class PlayingState : GameState
         super.handleInput();
 
         auto player = Game.getInstance().getPlayer();
-        auto playerVel = player.getComponent!Velocity;
+        auto vel = Vector2f(0, 0);
 
         if (Keyboard.isKeyPressed(Keyboard.Key.Left)) {
-            playerVel.vel.x = -playerSpeed;
+            vel.x = -playerSpeed;
         } else if (Keyboard.isKeyPressed(Keyboard.Key.Right)) {
-            playerVel.vel.x = playerSpeed;
-        } else {
-            playerVel.vel.x = 0;
+            vel.x = playerSpeed;
         }
+
+        player.setVelocity(vel);
     }
 
-    override void render()
+    override void render(RenderWindow window)
     {
         auto game = Game.getInstance();
-        auto window = game.getWindow();
-        auto groupManager = game.getWorld().getManager!GroupManager;
-        auto drawable = groupManager.getEntities("drawable");
+        auto entities = game.getEntities();
         auto player = game.getPlayer();
-        auto playerState = player.getComponent!EntityState;
         auto score = game.getScore();
 
-        window.clear();
-        window.draw(background);
-
         // Draw entities
-        for (size_t i = 0; i < drawable.size(); i++) {
-            Entity e = drawable.get(i);
-            auto sprite = e.getComponent!EntitySprite;
-            auto dim    = e.getComponent!Dimensions;
-            if (sprite.prepareRender(dim.position)) {
-                window.draw(sprite.getSprite());
+        foreach (e; entities) {
+            if (e.isDrawable()) {
+                window.draw(e.getSprite());
             }
         }
 
         // UI
-        healthbar.textureRect = IntRect(0, 0, 8 * playerState.health, 8);
+        healthbar.textureRect = IntRect(0, 0, 8 * player.getHealth(), 8);
         window.draw(healthbar);
         scoreText.setString(to!dstring(format("Score: %s", score)));
         window.draw(scoreText);
-
-        window.display();
     }
 
-    override bool update()
+    override bool update(float delta)
     {
-        auto game  = Game.getInstance();
-        auto world = game.getWorld();
-
-        if (backgroundMoving) {
-            backgroundPosition -= scrollSpeed;
-            // Avoiding creating a new IntRect every loop iteration
-            auto updatedRect = background.textureRect;
-            updatedRect.top = cast(int)backgroundPosition;
-            background.textureRect = updatedRect;
-            backgroundMoving = (backgroundPosition > 0);
-        }
+        auto game = Game.getInstance();
+        auto entities = game.getEntities();
 
         handleInput();
 
-        world.setDelta(1/60.0f);
-        world.process();
-
-        auto player = game.getPlayer();
-        auto playerState = player.getComponent!EntityState;
-        if (playerState.health <= 0) {
-            parent.transitionTo("gameover");
+        foreach (e; entities) {
+            e.update(delta);
         }
 
-        render();
+        auto player = game.getPlayer();
+        if (player.getHealth() <= 0) {
+            parent.transitionTo("gameover");
+        }
 
         return true;
     }

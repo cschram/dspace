@@ -6,26 +6,9 @@ class State
 {
     StateMachine parent;
 
-    const(string) getName()
+    const(string) getName() const
     {
         return "Unknown State";
-    }
-
-    const(string)[] getTransitions()
-    {
-        return [];
-    }
-
-    bool transition(State nextState)
-    {
-        foreach (t; getTransitions())
-        {
-            if (t == nextState.getName())
-            {
-                return onExit(nextState);
-            }
-        }
-        return false;
     }
 
     bool onEnter(State previousState)
@@ -38,7 +21,7 @@ class State
         return true;
     }
 
-    bool update()
+    bool update(float delta)
     {
         return true;
     }
@@ -46,8 +29,8 @@ class State
 
 class StateMachine
 {
-    private State[string] states;
-    private State         currentState;
+    private State[const(string)] states;
+    private State                currentState;
 
     void addState(State state)
     {
@@ -62,16 +45,16 @@ class StateMachine
         return currentState;
     }
 
-    string getCurrentStateName()
+    const(string) getCurrentStateName() const
     {
         return currentState.getName();
     }
 
-    bool transitionTo(string name)
+    bool transitionTo(const(string) name)
     {
         auto state = states.get(name, null);
         if (state !is null) {
-            if (currentState && (!currentState.transition(state) || !state.onEnter(currentState))) {
+            if (currentState && (!currentState.onExit(state) || !state.onEnter(currentState))) {
                 return false;
             }
             writeln("Transitioning to " ~ state.getName());
@@ -81,10 +64,10 @@ class StateMachine
         return false;
     }
 
-    bool update()
+    bool update(float delta)
     {
         if (currentState) {
-            return currentState.update();
+            return currentState.update(delta);
         }
         return false;
     }

@@ -9,7 +9,6 @@
     "lflags-linux-x86_64": [ "-L./lib/x86_64/linux/" ],
 	"dependencies": {
         "dsfml:graphics": "~master",
-        "dsfml:audio": "~master",
-        "artemisd": "~master"
+        "dsfml:audio": "~master"
 	}
 }

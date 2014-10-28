@@ -1,20 +1,22 @@
 module dspace.game;
 
 import std.stdio;
+import std.algorithm;
+
 import dsfml.graphics;
 import dsfml.audio;
-import artemisd.all;
+
 import dspace.resources;
 import dspace.statemachine;
-import dspace.components.dimensions;
-import dspace.components.entitysprite;
-import dspace.components.entitystate;
-import dspace.components.spritesheet;
-import dspace.components.velocity;
+import dspace.quadtree;
+
+import dspace.states.gamestate;
 import dspace.states.game.gameover;
 import dspace.states.game.playing;
 import dspace.states.game.startmenu;
-import dspace.systems.movement;
+
+import dspace.entity;
+import dspace.entities.player;
 
 class Game
 {
@@ -23,7 +25,8 @@ class Game
     // Constants
     //
 
-    static immutable(VideoMode) screenMode = VideoMode(400, 600);
+    static immutable(VideoMode) screenMode  = VideoMode(400, 600);
+    static immutable(float)     scrollSpeed = 0.5;
 
     //
     // Private Variables
@@ -34,11 +37,17 @@ class Game
 
     // State
     private RenderWindow    window;
-    private ResourceManager resources;
+    private ResourceManager resourceMgr;
     private StateMachine    states;
-    private World           world;
-    private Entity          player;
-    private int             score;
+    private Entity[]        entities;
+    private Player          player;
+    private QuadTree        qtree;
+    private Clock           clock;
+
+    private Sprite          background;
+    private int             score              = 0;
+    private float           backgroundPosition = 1000;
+    private bool            scrolling          = false;
 
     //
     // Private Methods
@@ -46,8 +55,35 @@ class Game
 
     private this()
     {
-        resources = new ResourceManager;
+        resourceMgr = new ResourceManager;
         states = new StateMachine;
+        qtree = new QuadTree(0, FloatRect(0, 0, screenMode.width, screenMode.height));
+        clock = new Clock;
+        background = resourceMgr.getSprite("images/background.png");
+        background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
+    }
+
+    private bool update(float delta)
+    {
+        if (scrolling) {
+            backgroundPosition -= scrollSpeed;
+            // Avoiding creating a new IntRect every loop iteration
+            auto updatedRect = background.textureRect;
+            updatedRect.top = cast(int)backgroundPosition;
+            background.textureRect = updatedRect;
+            scrolling = (backgroundPosition > 0);
+        }
+
+        return states.update(delta);
+    }
+
+    private void render()
+    {
+        window.clear();
+        window.draw(background);
+        GameState state = cast(GameState)states.getCurrentState();
+        state.render(window);
+        window.display();
     }
 
     //
@@ -67,24 +103,24 @@ class Game
         return _instance;
     }
 
-    RenderWindow getWindow()
+    ResourceManager getResourceMgr()
     {
-        return window;
+        return resourceMgr;
     }
 
-    ResourceManager getResources()
-    {
-        return resources;
-    }
-
-    World getWorld()
-    {
-        return world;
-    }
-
-    Entity getPlayer()
+    Player getPlayer()
     {
         return player;
+    }
+
+    Entity[] getEntities()
+    {
+        return entities;
+    }
+
+    void insertEntity(Entity e)
+    {
+        entities ~= e;
     }
 
     bool pollEvent(ref Event e)
@@ -110,37 +146,16 @@ class Game
 
     void run()
     {
-        writeln("Loading...");
-
-        // Setup window
-        writeln("Creating window...");
-        window = new RenderWindow(screenMode, "DSpace");
-        window.setFramerateLimit(60);
-
-        // Setup world
-        writeln("Creating world...");
-        world = new World();
-        world.setSystem(new MovementSystem);
-        auto groupManager = new GroupManager;
-        auto tagManager = new TagManager;
-        world.setManager(groupManager);
-        world.setManager(tagManager);
-        world.initialize();
-
-        // Setup player
-        writeln("Creating player...");
-        player = world.createEntity();
-        auto playerSprite = resources.getSprite("images/ship.png");
-        player.addComponent(new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61)));
-        player.addComponent(new Velocity(true));
-        player.addComponent(new EntityState(10));
-        player.addComponent(new SpriteSheet(playerSprite, Vector2i(55, 61), 3));
-        player.addToWorld();
-
-        // Setup states
         states.addState(new StartMenuState);
         states.addState(new PlayingState);
         states.addState(new GameOverState);
+
+        player = new Player(Vector2f(172.5, 539));
+        insertEntity(player);
+
+        writeln("Creating window...");
+        window = new RenderWindow(screenMode, "DSpace");
+        window.setFramerateLimit(60);
 
         // Main loop
         writeln("Starting...");
@@ -150,15 +165,21 @@ class Game
             window.close();
         }
 
+        clock.restart();
+        float delta = 0.0f;
         while (window.isOpen()) {
-            if (!states.update()) {
+            if (update(delta)) {
+                render();
+            } else {
                 writeln("Closing...");
                 window.close();
             }
+            delta = clock.getElapsedTime().asSeconds();
+            clock.restart();
         }
     }
 
-    bool hasStarted()
+    bool hasStarted() const
     {
         if (states.getCurrentStateName() == "playing") {
             return true;
@@ -166,7 +187,7 @@ class Game
         return false;
     }
 
-    public int getScore()
+    public int getScore() const
     {
         return score;
     }

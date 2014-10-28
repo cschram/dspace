@@ -2,32 +2,28 @@ module dspace.states.game.gameover;
 
 import dsfml.graphics;
 import dspace.game;
-import dspace.statemachine;
 import dspace.states.gamestate;
 
 class GameOverState : GameState
 {
-    private static const(string)   name        = "gameover";
-    private static const(string)[] transitions = [ "playing" ];
+    private static const(string) name = "gameover";
 
-    private Sprite background;
     private Sprite gameover;
 
     this()
     {
-        auto resources = Game.getInstance().getResources();
-        background = resources.getSprite("images/background.png");
-        gameover = resources.getSprite("images/gameover.png");
+        auto resourceMgr = Game.getInstance().getResourceMgr();
+        gameover = resourceMgr.getSprite("images/gameover.png");
         gameover.color = Color(255, 255, 255, 200);
     }
 
-    override const(string) getName()
+    override const(string) getName() const
     {
         return name;
     }
 
-    override const(string)[] getTransitions()
+    override void render(RenderWindow window)
     {
-        return transitions;
+        window.draw(gameover);
     }
 }

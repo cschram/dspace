@@ -1,6 +1,6 @@
 module dspace.states.gamestate;
 
-import dsfml.window;
+import dsfml.graphics;
 import dspace.game;
 import dspace.statemachine;
 
@@ -26,12 +26,11 @@ class GameState : State
         }
     }
 
-    void render() {}
+    void render(RenderWindow window) {}
 
-    override bool update()
+    override bool update(float delta)
     {
         handleInput();
-        render();
         return true;
     }
 }
