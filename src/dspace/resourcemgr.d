@@ -1,4 +1,4 @@
-module dspace.resources;
+module dspace.resourcemgr;
 
 import core.memory;
 import std.stdio;

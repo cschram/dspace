@@ -6,7 +6,7 @@ import std.algorithm;
 import dsfml.graphics;
 import dsfml.audio;
 
-import dspace.resources;
+import dspace.resourcemgr;
 import dspace.core.statemachine;
 import dspace.core.quadtree;
 
