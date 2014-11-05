@@ -2,10 +2,14 @@ module dspace.states.game.playing;
 
 import std.conv;
 import std.string;
+
+import artemisd.all;
 import dsfml.graphics;
-import dspace.game;
+
+import dspace.core.game;
 import dspace.core.statemachine;
 import dspace.states.gamestate;
+import dspace.components.velocity;
 
 class PlayingState : GameState
 {
@@ -13,12 +17,14 @@ class PlayingState : GameState
 
     public static immutable(float) playerSpeed = 250;
 
+    private Entity player;
     private Sprite healthbar;
     private Text   scoreText;
 
-    this()
+    this(Game pGame)
     {
-        auto resourceMgr = Game.getInstance().getResourceMgr();
+        super(pGame);
+        auto resourceMgr = Game.getResourceMgr();
         healthbar = resourceMgr.getSprite("images/healthbar.png");
         auto font = resourceMgr.getFont("fonts/slkscr.ttf");
         scoreText = new Text("Score: 0", font, 13);
@@ -32,64 +38,41 @@ class PlayingState : GameState
 
     override bool onEnter(State previousState)
     {
-        auto game = Game.getInstance();
+        player = game.getPlayer();
+        player.addToWorld();
         game.startScrolling();
         return super.onEnter(previousState);
     }
 
-    override void handleInput()
+    override bool onExit(State nextState)
     {
-        super.handleInput();
-
-        auto player = Game.getInstance().getPlayer();
-        auto vel = Vector2f(0, 0);
-
-        if (Keyboard.isKeyPressed(Keyboard.Key.Left)) {
-            vel.x = -playerSpeed;
-        } else if (Keyboard.isKeyPressed(Keyboard.Key.Right)) {
-            vel.x = playerSpeed;
-        }
-
-        player.setVelocity(vel);
+        player.deleteFromWorld();
+        return super.onExit(nextState);
     }
 
-    override void render(RenderWindow window)
+    override protected void renderUI(RenderWindow window)
     {
-        auto game = Game.getInstance();
-        auto entities = game.getEntities();
-        auto player = game.getPlayer();
-        auto score = game.getScore();
-
-        // Draw entities
-        foreach (e; entities) {
-            if (e.isDrawable()) {
-                window.draw(e.getSprite());
-            }
-        }
-
-        // UI
-        healthbar.textureRect = IntRect(0, 0, 8 * player.getHealth(), 8);
+        //healthbar.textureRect = IntRect(0, 0, 8 * player.getHealth(), 8);
+        healthbar.textureRect = IntRect(0, 0, 80, 8);
         window.draw(healthbar);
-        scoreText.setString(to!dstring(format("Score: %s", score)));
+        scoreText.setString(to!dstring(format("Score: %s", game.score)));
         window.draw(scoreText);
     }
 
-    override bool update(float delta)
+    override protected void update(float delta)
     {
-        auto game = Game.getInstance();
-        auto entities = game.getEntities();
+        auto playerVel = player.getComponent!Velocity;
 
-        handleInput();
+        //if (player.getHealth() <= 0) {
+        //    parent.transitionTo("gameover");
+        //}
 
-        foreach (e; entities) {
-            e.update(delta);
+        if (Keyboard.isKeyPressed(Keyboard.Key.Left)) {
+            playerVel.velocity.x = -playerSpeed;
+        } else if (Keyboard.isKeyPressed(Keyboard.Key.Right)) {
+            playerVel.velocity.x = playerSpeed;
+        } else {
+            playerVel.velocity.x = 0;
         }
-
-        auto player = game.getPlayer();
-        if (player.getHealth() <= 0) {
-            parent.transitionTo("gameover");
-        }
-
-        return true;
     }
 }

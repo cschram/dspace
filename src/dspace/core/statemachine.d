@@ -2,29 +2,17 @@ module dspace.core.statemachine;
 
 import std.stdio;
 
-class State
+interface State
 {
-    StateMachine parent;
+    const(string) getName() const;
 
-    const(string) getName() const
-    {
-        return "Unknown State";
-    }
+    void setParent(StateMachine parent);
 
-    bool onEnter(State previousState)
-    {
-        return true;
-    }
+    bool onEnter(State previousState);
 
-    bool onExit(State nextState)
-    {
-        return true;
-    }
+    bool onExit(State nextState);
 
-    bool update(float delta)
-    {
-        return true;
-    }
+    void update(float delta);
 }
 
 class StateMachine
@@ -36,7 +24,7 @@ class StateMachine
     {
         auto name = state.getName();
         writeln("Registered state " ~ name);
-        state.parent = this;
+        state.setParent(this);
         states[name] = state;
     }
 
@@ -54,7 +42,7 @@ class StateMachine
     {
         auto state = states.get(name, null);
         if (state !is null) {
-            if (currentState && (!currentState.onExit(state) || !state.onEnter(currentState))) {
+            if ((currentState && !currentState.onExit(state)) || !state.onEnter(currentState)) {
                 return false;
             }
             writeln("Transitioning to " ~ state.getName());
@@ -64,11 +52,10 @@ class StateMachine
         return false;
     }
 
-    bool update(float delta)
+    void update(float delta)
     {
         if (currentState) {
-            return currentState.update(delta);
+            currentState.update(delta);
         }
-        return false;
     }
 }

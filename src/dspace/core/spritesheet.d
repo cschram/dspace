@@ -2,7 +2,9 @@ module dspace.core.spritesheet;
 
 import dsfml.graphics;
 
-class SpriteSheet
+import dspace.core.renderable;
+
+class SpriteSheet : Renderable
 {
 
     private Sprite   sheet;
@@ -10,7 +12,7 @@ class SpriteSheet
     private int      count;
     private int      index;
 
-    public this(Sprite sheet, Vector2i size, int index=0)
+    this(Sprite sheet, Vector2i size, int index=0)
     {
         this.sheet = sheet;
         this.size  = size;
@@ -18,7 +20,7 @@ class SpriteSheet
         setIndex(index);
     }
 
-    public void setIndex(int i)
+    void setIndex(int i)
     {
         if (i < count) {
             index = i;
@@ -26,5 +28,15 @@ class SpriteSheet
         } else {
             setIndex(0);
         }
+    }
+
+    Sprite getSprite()
+    {
+        return sheet;
+    }
+
+    bool tick(float delta)
+    {
+        return true;
     }
 }

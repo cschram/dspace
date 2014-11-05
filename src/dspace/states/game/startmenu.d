@@ -2,7 +2,7 @@ module dspace.states.game.startmenu;
 
 import std.stdio;
 import dsfml.graphics;
-import dspace.game;
+import dspace.core.game;
 import dspace.states.gamestate;
 
 class StartMenuState : GameState
@@ -11,9 +11,10 @@ class StartMenuState : GameState
 
     private Text startText;
 
-    this()
+    this(Game pGame)
     {
-        auto resourceMgr = Game.getInstance().getResourceMgr();
+        super(pGame);
+        auto resourceMgr = game.getResourceMgr();
         auto font = resourceMgr.getFont("fonts/slkscr.ttf");
         startText = new Text("Press Space to Start", font, 30);
         startText.position = Vector2f(8, 270);
@@ -24,7 +25,7 @@ class StartMenuState : GameState
         return name;
     }
 
-    override void keyPressed(Keyboard.Key code)
+    override protected void keyPressed(Keyboard.Key code)
     {
         switch (code) {
             case Keyboard.Key.Space:
@@ -36,7 +37,7 @@ class StartMenuState : GameState
         }
     }
 
-    override void render(RenderWindow window)
+    override protected void renderUI(RenderWindow window)
     {
         window.draw(startText);
     }

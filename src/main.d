@@ -1,6 +1,6 @@
 import std.stdio;
 
-import dspace.game;
+import dspace.core.game;
 
 void main() {
     try {

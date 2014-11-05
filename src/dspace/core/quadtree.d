@@ -1,8 +1,11 @@
 module dspace.core.quadtree;
 
 import std.algorithm;
+
+import artemisd.all;
 import dsfml.graphics;
-import dspace.core.entity;
+
+import dspace.components.dimensions;
 
 class QuadTree
 {
@@ -87,7 +90,8 @@ class QuadTree
 
     void insert(Entity e)
     {
-        FloatRect eBounds = e.getBounds();
+        auto eDim = e.getComponent!Dimensions;
+        auto eBounds = FloatRect(eDim.position, eDim.size);
         if (nodes.length > 0) {
             auto i = getIndex(eBounds);
 
@@ -106,10 +110,11 @@ class QuadTree
 
             int i = 0;
             while (i < entities.length) {
-                int index = getIndex(entities[i].getBounds());
+                auto dim = entities[i].getComponent!Dimensions;
+                int index = getIndex(FloatRect(dim.position, dim.size));
                 if (index > -1) {
                     nodes[index].insert(e);
-                    nodes = remove(nodes, i);
+                    entities = entities.remove(i);
                 } else {
                     i++;
                 }

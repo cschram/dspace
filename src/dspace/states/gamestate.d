@@ -1,36 +1,80 @@
 module dspace.states.gamestate;
 
+import std.stdio;
+
 import dsfml.graphics;
-import dspace.game;
+import dspace.core.game;
 import dspace.core.statemachine;
 
 class GameState : State
 {
 
-    void keyPressed(Keyboard.Key code) {}
+    private   bool         active;
+    protected StateMachine parent;
+    protected Game         game;
 
-    void handleInput()
+    this(Game pGame)
     {
-        auto game = Game.getInstance();
-        Event e;
-        while (game.pollEvent(e))
-        {
-            switch (e.type)
-            {
-                case e.EventType.KeyPressed:
-                    keyPressed(e.key.code);
-                    break;
+        game = pGame;
+        game.connect(&this.handleEvent);
+    }
 
-                default: break;
-            }
+    private void handleEvent(GameEvent e)
+    {
+        if (!active) return;
+
+        switch (e.type) {
+            case GameEvent.EventType.STAGE_UPDATE:
+                switch (e.loopStage) {
+                    case GameEvent.LoopStage.UPDATE:
+                        update(e.delta);
+                        break;
+
+                    case GameEvent.LoopStage.RENDER_BACKGROUND:
+                        renderBackground(e.renderWindow);
+                        break;
+
+                    case GameEvent.LoopStage.RENDER_UI:
+                        renderUI(e.renderWindow);
+                        break;
+
+                    default: break;
+                }
+                break;
+
+            case GameEvent.EventType.KEY_PRESSED:
+                keyPressed(e.keyCode);
+                break;
+
+            default: break;
         }
     }
 
-    void render(RenderWindow window) {}
+    protected void update(float delta) {}
+    protected void renderBackground(RenderWindow window) {}
+    protected void renderUI(RenderWindow window) {}
+    protected void keyPressed(Keyboard.Key code) {}
 
-    override bool update(float delta)
+    const(string) getName() const
     {
-        handleInput();
+        return "Unknown Game State";
+    }
+
+    void setParent(StateMachine p)
+    {
+        parent = p;
+    }
+
+    bool onEnter(State previousState)
+    {
+        writeln("test");
+        active = true;
+        return true;
+    }
+
+    bool onExit(State nextState)
+    {
+        active = false;
         return true;
     }
 }

@@ -1,7 +1,7 @@
 module dspace.states.game.gameover;
 
 import dsfml.graphics;
-import dspace.game;
+import dspace.core.game;
 import dspace.states.gamestate;
 
 class GameOverState : GameState
@@ -10,9 +10,10 @@ class GameOverState : GameState
 
     private Sprite gameover;
 
-    this()
+    this(Game pGame)
     {
-        auto resourceMgr = Game.getInstance().getResourceMgr();
+        super(pGame);
+        auto resourceMgr = Game.getResourceMgr();
         gameover = resourceMgr.getSprite("images/gameover.png");
         gameover.color = Color(255, 255, 255, 200);
     }
@@ -22,7 +23,7 @@ class GameOverState : GameState
         return name;
     }
 
-    override void render(RenderWindow window)
+    override protected void renderUI(RenderWindow window)
     {
         window.draw(gameover);
     }

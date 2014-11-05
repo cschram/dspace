@@ -1,85 +1,115 @@
 module dspace.core.animation;
 
+import std.stdio;
 import std.conv;
 import std.json;
+
 import dsfml.system;
 import dsfml.graphics;
-import dspace.game;
+
+import dspace.core.game;
+import dspace.core.renderable;
 import dspace.core.spritesheet;
 
-class Animation
+struct AnimationFrame
+{
+    uint  index;    // Spritesheet Index
+    float duration; // Duration time
+}
+
+class Animation : Renderable
 {
 
-    private ushort[]    frames;
-    private Sprite      sprite;
-    private SpriteSheet spriteSheet;
-    private Vector2i    size;
-    private bool        loop;
-    private bool        finished;
-    private ushort      ticks;
-    private ushort      frame;
+    private AnimationFrame[] frames;
+    private Sprite           sprite;
+    private SpriteSheet      spriteSheet;
+    private Vector2i         size;
+    private bool             loop;
+    private bool             finished;
+    private float            timeDelta;
+    private uint             frameIndex;
+    private AnimationFrame   frame;
 
-    public this(Sprite _sprite, JSONValue config)
+    static Animation loadFromFile(const(string) name)
     {
-        sprite = _sprite;
-        size = Vector2i(
-            to!int(config.object["width"].integer),
-            to!int(cast(int)config.object["height"].integer)
-        );
+        auto resourceMgr = Game.getResourceMgr();
+        auto json = resourceMgr.getJSON(name);
 
-        spriteSheet = new SpriteSheet(_sprite, size);
+        auto sprite = resourceMgr.getSprite(json.object["sprite"].str);
+        auto size = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
 
-        auto loopval = config.object["loop"];
-        if (loopval.type() == JSON_TYPE.TRUE) {
-            loop = true;
+        AnimationFrame[] frames;
+        auto framesJSON = json.object["frames"].array;
+        for (size_t i = 0; i < framesJSON.length; i++) {
+            frames ~= AnimationFrame(
+                cast(uint)framesJSON[i].object["spriteIndex"].integer,
+                framesJSON[i].object["duration"].floating
+            );
+        }
+
+        if (json.object["loop"].type == JSON_TYPE.TRUE) {
+            return new Animation(sprite, frames, size, true);
         } else {
-            loop = false;
-        }
-
-        auto _frames = config.object["frames"].array;
-        frames.length = _frames.length;
-        for (size_t i = 0; i < _frames.length; i++) {
-            frames[i] = to!ushort(_frames[i].uinteger);
+            return new Animation(sprite, frames, size, false);
         }
     }
 
-    public Sprite getSprite()
+    this(Sprite pSprite, AnimationFrame[] pFrames, Vector2i pSize, bool pLoop)
     {
-        return sprite;
+        sprite = pSprite;
+        frames = pFrames;
+        size = pSize;
+        loop = pLoop;
+        frame = frames[0];
+        spriteSheet = new SpriteSheet(sprite, size, frame.index);
+        timeDelta = 0.0f;
     }
 
-    public bool tick(ushort numTicks)
+    private void setFrame(uint index)
     {
-        ticks += numTicks;
-
-        if (ticks > frames[frame]) {
-            ticks = 0;
-            frame++;
-
-            if (frame >= frames.length) {
-                frame = 0;
-                if (!loop) {
-                    finished = true;
-                    return true;
-                }
-            }
-
-            spriteSheet.setIndex(frame);
-        }
-
-        return false;
+        frame = frames[index];
+        spriteSheet.setIndex(frame.index);
     }
 
-    public bool isPlaying()
+    bool isPlaying()
     {
         return !finished;
     }
 
-    public void restart()
+    void restart()
     {
-        ticks = 0;
-        frame = 0;
+        timeDelta = 0;
+        frameIndex = 0;
         finished = false;
+        setFrame(0);
     }
 
+    Sprite getSprite()
+    {
+        return sprite;
+    }
+
+    bool tick(float delta)
+    {
+        if (finished) return false;
+
+        timeDelta += delta;
+
+        if (timeDelta > frame.duration) {
+            timeDelta = 0;
+            frameIndex++;
+
+            if (frameIndex >= frames.length) {
+                frameIndex = 0;
+                if (!loop) {
+                    finished = true;
+                    return false;
+                }
+            }
+
+            setFrame(frameIndex);
+        }
+
+        return true;
+    }
 }
