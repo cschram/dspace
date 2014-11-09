@@ -9,6 +9,7 @@ import dsfml.graphics;
 import dsfml.audio;
 
 import dspace.components.dimensions;
+import dspace.components.playerstate;
 import dspace.components.renderer;
 import dspace.components.velocity;
 import dspace.core.resourcemgr;
@@ -143,6 +144,7 @@ class Game
         GameEvent e;
         e.type = GameEvent.EventType.STAGE_UPDATE;
         e.loopStage = GameEvent.LoopStage.UPDATE;
+        e.delta = delta;
         emit(e);
 
         world.setDelta(delta);
@@ -250,10 +252,6 @@ class Game
      */
     void run()
     {
-        states.addState(new StartMenuState(this));
-        states.addState(new PlayingState(this));
-        states.addState(new GameOverState(this));
-
         writeln("Creating window...");
         window = new RenderWindow(screenMode, "DSpace");
         window.setFramerateLimit(60);
@@ -269,9 +267,16 @@ class Game
 
         player = world.createEntity();
         player.addComponent(new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61)));
-        player.addComponent(new Velocity(Vector2f(0.0f, 0.0f), true));
+        player.addComponent(new PlayerState());
         player.addComponent(new Renderer(resourceMgr.getAnimationSet("anim/player.animset")));
+        player.addComponent(new Velocity(Vector2f(0.0f, 0.0f), true));
+        player.addToWorld();
+        player.disable();
         worldTagManager.register("player", player);
+
+        states.addState(new StartMenuState(this));
+        states.addState(new PlayingState(this));
+        states.addState(new GameOverState(this));
 
         if (!states.transitionTo("startmenu")) {
             writeln("Unable to transition to Start Menu, closing...");

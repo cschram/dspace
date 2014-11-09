@@ -39,7 +39,7 @@ class AnimationSet : Renderable
             if (animJSON.object["loop"].type == JSON_TYPE.TRUE) {
                 animations[animName] = new Animation(sprite, frames, size, true);
             } else {
-                animations[animName] = new Animation(sprite, frames, size, true);
+                animations[animName] = new Animation(sprite, frames, size, false);
             }
         }
 
@@ -51,8 +51,7 @@ class AnimationSet : Renderable
         sprite = pSprite;
         size = pSize;
         animations = pAnim;
-        currentAnimName = animations.keys[0];
-        currentAnim = animations[currentAnimName];
+        setAnimation(animations.keys[0]);
     }
 
     Sprite getSprite()
@@ -65,10 +64,15 @@ class AnimationSet : Renderable
         return currentAnim.tick(delta);
     }
 
-    void setAnimation(string name)
+    void setAnimation(string name, bool restart=false)
     {
-        currentAnimName = name;
-        currentAnim = animations[name];
-        currentAnim.restart();
+        if (name == currentAnimName) {
+            if (restart)
+                currentAnim.restart();
+        } else {
+            currentAnimName = name;
+            currentAnim = animations[name];
+            currentAnim.restart();
+        }
     }
 }

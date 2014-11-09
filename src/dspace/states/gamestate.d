@@ -67,7 +67,6 @@ class GameState : State
 
     bool onEnter(State previousState)
     {
-        writeln("test");
         active = true;
         return true;
     }
