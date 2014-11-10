@@ -11,7 +11,9 @@ import dspace.components.playerstate;
 import dspace.components.renderer;
 import dspace.components.velocity;
 import dspace.core.animationset;
+import dspace.core.enemyspawner;
 import dspace.core.game;
+import dspace.core.spawner;
 import dspace.core.statemachine;
 import dspace.states.gamestate;
 
@@ -27,6 +29,7 @@ class PlayingState : GameState
     private PlayerState  playerState;
     private Sprite       healthbar;
     private Text         scoreText;
+    private Spawner[]    spawners;
 
     this(Game pGame)
     {
@@ -41,6 +44,24 @@ class PlayingState : GameState
         auto font = resourceMgr.getFont("fonts/slkscr.ttf");
         scoreText = new Text("Score: 0", font, 13);
         scoreText.position = Vector2f(2, 10);
+
+        auto spawnArea = FloatRect(0.0f, 0.0f, cast(float)game.screenMode.width, 0.0f);
+        // Drone Spawner
+        spawners ~= new EnemySpawner(game, spawnArea, 4.0f, new EnemyDetails(
+            "drone",           // Type Name
+            Vector2f(17, 20),  // Size
+            "anim/drone.anim", // Animation
+            150.0f,            // Speed
+            1.0f               // Max Health
+        ));
+        // Seraph Spawner
+        spawners ~= new EnemySpawner(game, spawnArea, 8.0f, new EnemyDetails(
+            "seraph",           // Type Name
+            Vector2f(17, 20),   // Size
+            "anim/seraph.anim", // Animation
+            100.0f,             // Speed
+            2.0f                // Max Health
+        ));
     }
 
     override const(string) getName() const
@@ -80,6 +101,11 @@ class PlayingState : GameState
         } else {
             playerVel.velocity.x = 0;
             playerAnim.setAnimation("idle");
+        }
+
+        foreach (spawner; spawners) {
+            spawner.tick(delta);
+            spawner.setInterval(spawner.getInterval() - (delta / 10));
         }
     }
 }

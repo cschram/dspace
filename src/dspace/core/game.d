@@ -9,6 +9,7 @@ import dsfml.graphics;
 import dsfml.audio;
 
 import dspace.components.dimensions;
+import dspace.components.enemystate;
 import dspace.components.playerstate;
 import dspace.components.renderer;
 import dspace.components.velocity;
@@ -70,7 +71,7 @@ class Game
     private ResourceManager resourceMgr;
     private StateMachine    states;
     private World           world;
-    private TagManager      worldTagManager;
+    private TagManager      worldTagMgr;
     private Entity          player;
     private Clock           clock;
 
@@ -101,7 +102,6 @@ class Game
         resourceMgr = new ResourceManager;
         states = new StateMachine;
         clock = new Clock;
-
         background = resourceMgr.getSprite("images/background.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
     }
@@ -211,6 +211,11 @@ class Game
         return world;
     }
 
+    TagManager getTagMgr()
+    {
+        return worldTagMgr;
+    }
+
     Entity getPlayer()
     {
         return player;
@@ -218,7 +223,7 @@ class Game
 
     Entity getTaggedEntity(const(string) name)
     {
-        return worldTagManager.getEntity(name);
+        return worldTagMgr.getEntity(name);
     }
 
     bool hasStarted() const
@@ -261,18 +266,18 @@ class Game
         world.setSystem(new MovementSystem(this));
         world.setSystem(new AnimationSystem(this));
         world.setSystem(new RenderSystem(this));
-        worldTagManager = new TagManager;
-        world.setManager(worldTagManager);
+        worldTagMgr = new TagManager;
+        world.setManager(worldTagMgr);
         world.initialize();
 
         player = world.createEntity();
         player.addComponent(new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61)));
-        player.addComponent(new PlayerState());
+        player.addComponent(new PlayerState);
         player.addComponent(new Renderer(resourceMgr.getAnimationSet("anim/player.animset")));
         player.addComponent(new Velocity(Vector2f(0.0f, 0.0f), true));
         player.addToWorld();
         player.disable();
-        worldTagManager.register("player", player);
+        worldTagMgr.register("player", player);
 
         states.addState(new StartMenuState(this));
         states.addState(new PlayingState(this));

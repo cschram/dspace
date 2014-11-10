@@ -13,8 +13,8 @@ import dspace.core.spritesheet;
 
 struct AnimationFrame
 {
-    uint  index;    // Spritesheet Index
-    float duration; // Duration time
+    uint  spriteIndex;
+    float duration;
 }
 
 class Animation : Renderable
@@ -61,14 +61,14 @@ class Animation : Renderable
         size = pSize;
         loop = pLoop;
         frame = frames[0];
-        spriteSheet = new SpriteSheet(sprite, size, frame.index);
+        spriteSheet = new SpriteSheet(sprite, size, frame.spriteIndex);
         timeDelta = 0.0f;
     }
 
     private void setFrame(uint index)
     {
         frame = frames[index];
-        spriteSheet.setIndex(frame.index);
+        spriteSheet.setIndex(frame.spriteIndex);
     }
 
     bool isPlaying()
