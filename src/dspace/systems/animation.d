@@ -22,9 +22,12 @@ class AnimationSystem : EntityProcessingSystem
     override void process(Entity e)
     {
         auto renderer = e.getComponent!Renderer;
-        renderer.target.tick(world.getDelta());
-        //if (!renderer.target.tick(world.getDelta())) {
-        //    renderer.visible = false;
-        //}
+        if (!renderer.target.tick(world.getDelta())) {
+            if (renderer.hideOnComplete) {
+                renderer.visible = false;
+            } else if (renderer.destroyOnComplete) {
+                e.deleteFromWorld();
+            }
+        }
     }
 }
