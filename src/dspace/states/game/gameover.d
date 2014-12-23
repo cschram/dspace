@@ -34,6 +34,12 @@ class GameOverState : GameState
         return super.onEnter(previousState);
     }
 
+    override bool onExit(State nextState)
+    {
+        game.clearEntities();
+        return super.onExit(nextState);
+    }
+
     override protected void keyPressed(Keyboard.Key code)
     {
         switch (code) {

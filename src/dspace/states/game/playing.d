@@ -7,6 +7,7 @@ import std.string;
 import artemisd.all;
 import dsfml.graphics;
 
+import dspace.components.dimensions;
 import dspace.components.playerstate;
 import dspace.components.renderer;
 import dspace.components.velocity;
@@ -21,10 +22,11 @@ class PlayingState : GameState
 {
     private static const(string) name = "playing";
 
-    public static immutable(float) playerSpeed = 250;
+    public static immutable(float) playerSpeed = 250.0f;
 
     private Entity       player;
     private Velocity     playerVel;
+    private Dimensions   playerDim;
     private AnimationSet playerAnim;
     private PlayerState  playerState;
     private Sprite       healthbar;
@@ -36,6 +38,7 @@ class PlayingState : GameState
         super(pGame);
         player = game.getPlayer();
         playerVel = player.getComponent!Velocity;
+        playerDim = player.getComponent!Dimensions;
         playerAnim = cast(AnimationSet)player.getComponent!(Renderer).target;
         playerState = player.getComponent!PlayerState;
 
@@ -71,9 +74,17 @@ class PlayingState : GameState
 
     override bool onEnter(State previousState)
     {
+        // Reset/enable player
         playerState.health = playerState.maxHealth;
         player.enable();
+
+        // Reset spawners
+        spawners[0].setInterval(4.0f);
+        spawners[1].setInterval(8.0f);
+
+        // Start background scrolling
         game.startScrolling();
+
         return super.onEnter(previousState);
     }
 
@@ -84,6 +95,20 @@ class PlayingState : GameState
         window.draw(healthbar);
         scoreText.setString(to!dstring(format("Score: %s", game.score)));
         window.draw(scoreText);
+    }
+
+    override protected void keyPressed(Keyboard.Key code)
+    {
+        switch (code) {
+            case Keyboard.Key.Space:
+                float x = playerDim.position.x + (playerDim.size.x / 2) - 2.0f;
+                float y = playerDim.position.y - 9.0f;
+                game.spawnBullet(Vector2f(x, y), CardinalDirection.UP);
+                break;
+
+            default:
+                break;
+        }
     }
 
     override protected void update(float delta)

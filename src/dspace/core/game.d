@@ -14,14 +14,24 @@ import dspace.components.playerstate;
 import dspace.components.renderer;
 import dspace.components.velocity;
 import dspace.core.resourcemgr;
+import dspace.core.spritesheet;
 import dspace.core.statemachine;
 import dspace.states.gamestate;
 import dspace.states.game.gameover;
 import dspace.states.game.playing;
 import dspace.states.game.startmenu;
 import dspace.systems.animation;
+import dspace.systems.collision;
 import dspace.systems.movement;
 import dspace.systems.render;
+
+enum CardinalDirection
+{
+    UP         = 0,
+    LEFT       = 1,
+    DOWN       = 2,
+    RIGHT      = 3,
+}
 
 /*****************************************************************************
  * Game Event
@@ -72,6 +82,7 @@ class Game
     private StateMachine    states;
     private World           world;
     private TagManager      worldTagMgr;
+    private GroupManager    worldGroupMgr;
     private Entity          player;
     private Clock           clock;
 
@@ -89,6 +100,7 @@ class Game
       */
     static immutable(VideoMode) screenMode    = VideoMode(400, 600);
     static immutable(short)     scrollSpeed   = 30;
+    static immutable(float)     bulletSpeed   = 200.0f;
     static immutable(float)     cacheInterval = 1.0f;
 
     int score;
@@ -216,6 +228,11 @@ class Game
         return worldTagMgr;
     }
 
+    GroupManager getGroupMgr()
+    {
+        return worldGroupMgr;
+    }
+
     Entity getPlayer()
     {
         return player;
@@ -244,6 +261,67 @@ class Game
         backgroundPosition = 1000;
     }
 
+    void spawnBullet(Vector2f pos, CardinalDirection dir)
+    {
+        auto sheet = new SpriteSheet(resourceMgr.getSprite("images/bullets.png"), Vector2i(4, 8));
+        Vector2f vel;
+        if (dir == CardinalDirection.DOWN) {
+            sheet.setIndex(1);
+            vel = Vector2f(0, bulletSpeed);
+        } else {
+            vel = Vector2f(0, -bulletSpeed);
+        }
+
+        auto entity = world.createEntity();
+        entity.addComponent(new Dimensions(pos, Vector2f(4.0f, 8.0f), CollideType.DAMAGE, 1.0f));
+        entity.addComponent(new Renderer(sheet));
+        entity.addComponent(new Velocity(vel));
+        entity.addToWorld();
+        worldGroupMgr.add(entity, "collidable");
+    }
+
+    void spawnExplosion(Vector2f pos)
+    {
+        auto entity = world.createEntity();
+        entity.addComponent(new Dimensions(pos, Vector2f(64.0f, 64.0f), CollideType.NO_COLLIDE));
+        entity.addComponent(new Renderer(resourceMgr.getAnimation("anim/explosion.anim"), true, false, true));
+        entity.addToWorld();
+    }
+
+    void hitEntity(Entity e, float damage)
+    {
+        if (e == player) {
+            auto state = e.getComponent!PlayerState;
+            state.health -= damage;
+            if (state.health <= 0) {
+                spawnExplosion((e.getComponent!Dimensions).position);
+                e.disable();
+                states.transitionTo("gameovoer");
+            }
+        } else if (worldGroupMgr.isInGroup(e, "enemy")) {
+            auto state = e.getComponent!EnemyState;
+            state.health -= damage;
+            if (state.health <= 0) {
+                spawnExplosion((e.getComponent!Dimensions).position);
+                e.deleteFromWorld();
+            }
+        } else {
+            e.deleteFromWorld();
+        }
+    }
+
+    void clearEntities()
+    {
+        // XXX: Need better way of getting all clearable entities
+        auto entities = worldGroupMgr.getEntities("collidable");
+        for (size_t i = 0; i < entities.size(); i++) {
+            auto entity = entities.get(i);
+            if (entity != player) {
+                entity.deleteFromWorld();
+            }
+        }
+    }
+
     void close()
     {
         GameEvent e;
@@ -263,21 +341,25 @@ class Game
 
         writeln("Creating world...");
         world = new World;
-        world.setSystem(new MovementSystem(this));
-        world.setSystem(new AnimationSystem(this));
-        world.setSystem(new RenderSystem(this));
         worldTagMgr = new TagManager;
         world.setManager(worldTagMgr);
+        worldGroupMgr = new GroupManager;
+        world.setManager(worldGroupMgr);
+        world.setSystem(new MovementSystem(this));
+        world.setSystem(new CollisionSystem(this));
+        world.setSystem(new AnimationSystem(this));
+        world.setSystem(new RenderSystem(this));
         world.initialize();
 
         player = world.createEntity();
-        player.addComponent(new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61)));
+        player.addComponent(new Dimensions(Vector2f(172.5, 539), Vector2f(55, 61), CollideType.DAMAGE, 2.0f));
         player.addComponent(new PlayerState);
         player.addComponent(new Renderer(resourceMgr.getAnimationSet("anim/player.animset")));
         player.addComponent(new Velocity(Vector2f(0.0f, 0.0f), true));
         player.addToWorld();
         player.disable();
         worldTagMgr.register("player", player);
+        worldGroupMgr.add(player, "collidable");
 
         states.addState(new StartMenuState(this));
         states.addState(new PlayingState(this));

@@ -36,6 +36,7 @@ class Spawner
     protected World           world;
     protected ResourceManager resourceMgr;
     protected TagManager      tagMgr;
+    protected GroupManager    groupMgr;
     private   EntityDetails   entityDetails;
     private   FloatRect       area;
     protected float           interval;
@@ -46,6 +47,7 @@ class Spawner
         world = game.getWorld();
         resourceMgr = game.getResourceMgr();
         tagMgr = game.getTagMgr();
+        groupMgr = game.getGroupMgr();
         area = pArea;
         interval = pInterval;
         entityDetails = pDetails;
@@ -82,7 +84,8 @@ class Spawner
         auto entity = world.createEntity();
         addComponents(entity, getRandomPos());
         entity.addToWorld();
-        tagMgr.register(entityDetails.typeName, entity);
+        groupMgr.add(entity, entityDetails.typeName);
+        groupMgr.add(entity, "collidable");
         return entity;
     }
 

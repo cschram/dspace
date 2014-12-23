@@ -3,6 +3,9 @@ module dspace.core.enemyspawner;
 import artemisd.all;
 import dsfml.graphics;
 
+import dspace.behaviors.enemybehavior;
+import dspace.components.ai;
+import dspace.components.dimensions;
 import dspace.components.enemystate;
 import dspace.core.game;
 import dspace.core.spawner;
@@ -33,13 +36,19 @@ class EnemySpawner : Spawner
     override protected void addComponents(Entity e, Vector2f pos)
     {
         super.addComponents(e, pos);
+        e.addComponent(new AI(new EnemyBehavior));
         e.addComponent(new EnemyState(enemyDetails.maxHealth, enemyDetails.maxHealth));
+
+        // Set collision type
+        auto dim = e.getComponent!Dimensions;
+        dim.collisionType = CollideType.DAMAGE;
+        dim.collisionDamage = enemyDetails.maxHealth;
     }
 
     override protected Entity spawn()
     {
         auto entity = super.spawn();
-        tagMgr.register("enemy", entity);
+        groupMgr.add(entity, "enemy");
         return entity;
     }
 

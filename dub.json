@@ -7,6 +7,11 @@
     "targetPath": "bin",
     "lflags-windows-x86": [ "+lib\\x86\\windows\\" ],
     "lflags-linux-x86_64": [ "-L./lib/x86_64/linux/" ],
+    "buildTypes": {
+       "release": {
+           "lflags-windows": ["-L/exet:nt/su:windows"]
+       }
+    },
 	"dependencies": {
         "dsfml:graphics": "~master",
         "dsfml:audio": "~master",

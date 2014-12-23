@@ -1,7 +1,5 @@
 module dspace.systems.movement;
 
-import std.stdio;
-
 import artemisd.all;
 
 import dspace.components.dimensions;
@@ -31,6 +29,7 @@ class MovementSystem : EntityProcessingSystem
         auto dim = e.getComponent!Dimensions;
         auto vel = e.getComponent!Velocity;
 
+        dim.lastPosition = dim.position;
         dim.position += vel.velocity * delta;
 
         if (vel.keepInWindow) {
@@ -43,6 +42,15 @@ class MovementSystem : EntityProcessingSystem
                 dim.position.y = 0;
             } else if ((dim.position.y + dim.size.y) > Game.screenMode.height) {
                 dim.position.y = Game.screenMode.height - dim.size.y;
+            }
+        } else {
+            if (
+                (dim.position.x + dim.size.x) < 0 ||
+                dim.position.x > Game.screenMode.width ||
+                (dim.position.y + dim.size.y) < 0 ||
+                dim.position.y > Game.screenMode.height
+            ) {
+                e.deleteFromWorld();
             }
         }
     }

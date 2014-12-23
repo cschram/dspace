@@ -1,5 +1,6 @@
 module dspace.core.quadtree;
 
+import std.stdio;
 import std.algorithm;
 
 import artemisd.all;
