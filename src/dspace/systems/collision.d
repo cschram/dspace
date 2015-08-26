@@ -8,6 +8,7 @@ import dsfml.graphics;
 
 import dspace.core.game;
 import dspace.core.quadtree;
+import dspace.core.util;
 import dspace.components.dimensions;
 
 class CollisionSystem : EntityProcessingSystem
@@ -45,13 +46,13 @@ class CollisionSystem : EntityProcessingSystem
         auto rect = FloatRect(dim.position, dim.size);
         auto entities = tree.retrieve(rect);
         foreach (collider; entities) {
-            if (collider == e)
+            if (collider == e || dim.collisionType == CollideType.NO_COLLIDE)
                 continue;
 
             auto colliderDim = collider.getComponent!Dimensions;
             auto colliderRect = FloatRect(colliderDim.position, colliderDim.size);
 
-            if (rect.intersects(colliderRect)) {
+            if (checkCollision(rect, colliderRect) == CollisionState.OVERLAPPING) {
                 if (dim.collisionType == CollideType.BLOCK) {
                     colliderDim.position = colliderDim.lastPosition;
                 } else if (dim.collisionType == CollideType.DAMAGE) {

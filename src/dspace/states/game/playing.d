@@ -102,7 +102,7 @@ class PlayingState : GameState
         switch (code) {
             case Keyboard.Key.Space:
                 float x = playerDim.position.x + (playerDim.size.x / 2) - 2.0f;
-                float y = playerDim.position.y - 9.0f;
+                float y = playerDim.position.y - 20.0f;
                 game.spawnBullet(Vector2f(x, y), CardinalDirection.UP);
                 break;
 
