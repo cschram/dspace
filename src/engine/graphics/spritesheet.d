@@ -1,10 +1,8 @@
-module dspace.core.spritesheet;
+module engine.graphics.spritesheet;
 
 import dsfml.graphics;
 
-import dspace.core.renderable;
-
-class SpriteSheet : Renderable
+class SpriteSheet
 {
 
     private Sprite   sheet;
@@ -33,10 +31,5 @@ class SpriteSheet : Renderable
     Sprite getSprite()
     {
         return sheet;
-    }
-
-    bool tick(float delta)
-    {
-        return true;
     }
 }

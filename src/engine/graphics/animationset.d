@@ -1,14 +1,13 @@
-module dspace.core.animationset;
+module engine.graphics.animationset;
 
 import std.json;
 
 import dsfml.graphics;
 
-import dspace.core.game;
-import dspace.core.animation;
-import dspace.core.renderable;
+import engine.resourcemgr;
+import engine.graphics.animation;
 
-class AnimationSet : Renderable
+class AnimationSet
 {
     private Sprite            sprite;
     private Vector2i          size;
@@ -16,12 +15,10 @@ class AnimationSet : Renderable
     private string            currentAnimName;
     private Animation         currentAnim;
 
-    static AnimationSet loadFromFile(const(string) name)
+    static AnimationSet loadFromFile(string name)
     {
-        auto resourceMgr = Game.getResourceMgr();
-        auto json = resourceMgr.getJSON(name);
-
-        auto sprite = resourceMgr.getSprite(json.object["sprite"].str);
+        auto json = ResourceManager.getJSON(name);
+        auto sprite = ResourceManager.getSprite(json.object["sprite"].str);
         auto size = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
 
         Animation[string] animations;
@@ -66,9 +63,8 @@ class AnimationSet : Renderable
 
     void setAnimation(string name, bool restart=false)
     {
-        if (name == currentAnimName) {
-            if (restart)
-                currentAnim.restart();
+        if (name == currentAnimName && restart) {
+            currentAnim.restart();
         } else {
             currentAnimName = name;
             currentAnim = animations[name];

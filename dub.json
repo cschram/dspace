@@ -1,20 +1,21 @@
 {
-	"name": "dspace",
-	"description": "Simple space shmup game written in D.",
-	"copyright": "Copyright © 2014, Corey Schram",
-	"authors": [ "Corey Schram" ],
+    "name": "dspace",
+    "description": "Simple space shmup game written in D.",
+    "copyright": "Copyright © 2014, Corey Schram",
+    "authors": [ "Corey Schram" ],
     "license": "MIT",
     "targetPath": "bin",
     "lflags-windows-x86": [ "+lib\\x86\\windows\\" ],
-    "lflags-linux-x86_64": [ "-L./lib/x86_64/linux/" ],
+    "lflags-linux-x86_64": [ "-Llib/x86_64/linux/" ],
+    "lflags-osx-x86_64": [ "-Llib/x86_64/osx/" ],
     "buildTypes": {
-       "release": {
-           "lflags-windows": ["-L/exet:nt/su:windows"]
-       }
+        "release": {
+            "lflags-windows": [ "-L/exet:nt/su:windows" ]
+        }
     },
-	"dependencies": {
+    "dependencies": {
         "dsfml:graphics": "~master",
         "dsfml:audio": "~master",
-        "artemisd": "~master"
-	}
+        "star-entity": "~>1.0.6"
+    }
 }

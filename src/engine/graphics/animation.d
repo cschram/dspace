@@ -1,4 +1,4 @@
-module dspace.core.animation;
+module engine.graphics.animation;
 
 import std.stdio;
 import std.conv;
@@ -7,9 +7,8 @@ import std.json;
 import dsfml.system;
 import dsfml.graphics;
 
-import dspace.core.game;
-import dspace.core.renderable;
-import dspace.core.spritesheet;
+import engine.resourcemgr;
+import engine.graphics.spritesheet;
 
 struct AnimationFrame
 {
@@ -17,9 +16,8 @@ struct AnimationFrame
     float duration;
 }
 
-class Animation : Renderable
+class Animation
 {
-
     private AnimationFrame[] frames;
     private Sprite           sprite;
     private SpriteSheet      spriteSheet;
@@ -30,12 +28,10 @@ class Animation : Renderable
     private uint             frameIndex;
     private AnimationFrame   frame;
 
-    static Animation loadFromFile(const(string) name)
+    static Animation loadFromFile(string name)
     {
-        auto resourceMgr = Game.getResourceMgr();
-        auto json = resourceMgr.getJSON(name);
-
-        auto sprite = resourceMgr.getSprite(json.object["sprite"].str);
+        auto json = ResourceManager.getJSON(name);
+        auto sprite = ResourceManager.getSprite(json.object["sprite"].str);
         auto size = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
 
         AnimationFrame[] frames;
