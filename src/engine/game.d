@@ -1,12 +1,12 @@
 module engine.game;
 
 import std.stdio;
-import std.signals;
 
 import dsfml.graphics;
 
 import engine.resourcemgr;
-import engine.statemgr;
+import engine.states.idle;
+import engine.states.manager;
 
 abstract class Game
 {
@@ -16,17 +16,25 @@ abstract class Game
     this()
     {
         stateMgr = new StateManager();
+
+        initWindow();
         configure();
     }
 
-    protected void configure()
+    protected void initWindow()
     {
         window = new RenderWindow(VideoMode(800, 600), "D Game Engine");
         window.setFramerateLimit(60);
     }
 
+    protected void configure()
+    {
+        stateMgr.addState("idle", new IdleState(window));
+    }
+
     protected void pollEvents()
     {
+        auto state = stateMgr.getState();
         Event e;
         while (window.pollEvent(e)) {
             switch (e.type) {
@@ -36,6 +44,7 @@ abstract class Game
 
                 default: break;
             }
+            state.handleInput(e);
         }
     }
 
@@ -51,8 +60,6 @@ abstract class Game
         float delta = 0.0f;
         float cacheTimer = 1.0f;
 
-        initWindow();
-
         debug writeln("Starting...");
         while (window.isOpen()) {
             cacheTimer -= delta;
@@ -62,6 +69,7 @@ abstract class Game
             }
 
             pollEvents();
+            stateMgr.getState().update(delta);
 
             delta = clock.getElapsedTime().asSeconds();
             clock.restart();

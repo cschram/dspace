@@ -1,10 +1,7 @@
 module engine.graphics.animation;
 
-import std.stdio;
-import std.conv;
 import std.json;
 
-import dsfml.system;
 import dsfml.graphics;
 
 import engine.resourcemgr;

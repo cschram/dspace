@@ -1,24 +1,13 @@
-module engine.statemgr;
+module engine.states.manager;
 
-import dsfml.graphics;
-
-import engine.game;
-
-interface GameState
-{
-    bool enter(string prev);
-    bool exit(string next);
-
-    void handleInput(Event evt);
-    void update(float delta);
-}
+import engine.states.state;
 
 class StateManager
 {
-    private GameState[string] states;
+    private State[string] states;
     private string            currentState;
 
-    void addState(string name, GameState state)
+    void addState(string name, State state)
     {
         states[name] = state;
         if (currentState == "") {
@@ -37,7 +26,7 @@ class StateManager
         }
     }
 
-    void getState()
+    State getState()
     {
         return states[currentState];
     }

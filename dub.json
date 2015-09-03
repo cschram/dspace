@@ -15,7 +15,6 @@
     },
     "dependencies": {
         "dsfml:graphics": "~master",
-        "dsfml:audio": "~master",
-        "star-entity": "~>1.0.6"
+        "dsfml:audio": "~master"
     }
 }

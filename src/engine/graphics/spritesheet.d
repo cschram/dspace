@@ -4,7 +4,6 @@ import dsfml.graphics;
 
 class SpriteSheet
 {
-
     private Sprite   sheet;
     private Vector2i size;
     private int      count;
