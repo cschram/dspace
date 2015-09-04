@@ -13,7 +13,7 @@ struct AnimationFrame
     float duration;
 }
 
-class Animation
+class Animation : Drawable
 {
     private AnimationFrame[] frames;
     private Sprite           sprite;
@@ -77,11 +77,6 @@ class Animation
         setFrame(0);
     }
 
-    Sprite getSprite()
-    {
-        return sprite;
-    }
-
     bool tick(float delta)
     {
         if (finished) return false;
@@ -104,5 +99,10 @@ class Animation
         }
 
         return true;
+    }
+
+    override void draw(RenderTarget target, RenderStates renderStates)
+    {
+        sprite.draw(target, renderStates);
     }
 }

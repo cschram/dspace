@@ -1,4 +1,4 @@
-module dspace.states.start;
+module dspace.states.startmenu;
 
 import dsfml.graphics;
 
@@ -6,7 +6,7 @@ import engine.game;
 import engine.resourcemgr;
 import engine.states.state;
 
-class StartState : State
+class StartMenuState : State
 {
     private Game         game;
     private RenderWindow window;
@@ -33,7 +33,7 @@ class StartState : State
 
     bool exit(string next)
     {
-        return (next == "game");
+        return (next == "playing");
     }
 
     void handleInput(Event evt)
@@ -41,7 +41,7 @@ class StartState : State
         if (evt.type == Event.EventType.KeyPressed &&
             evt.key.code == Keyboard.Key.Space)
         {
-            game.setState("game");
+            game.setState("playing");
         }
     }
 

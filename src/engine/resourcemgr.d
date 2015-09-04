@@ -125,7 +125,7 @@ final abstract class ResourceManager
         synchronized {
             auto animSet = animSetCache.get(name);
             if (animSet is null) {
-                animSet = AnimationSet.loadFromFile(mergePath(name));
+                animSet = AnimationSet.loadFromFile(name);
                 animSetCache.set(name, animSet);
             }
             return animSet;

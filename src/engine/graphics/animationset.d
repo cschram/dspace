@@ -7,7 +7,7 @@ import dsfml.graphics;
 import engine.resourcemgr;
 import engine.graphics.animation;
 
-class AnimationSet
+class AnimationSet : Drawable
 {
     private Sprite            sprite;
     private Vector2i          size;
@@ -51,16 +51,6 @@ class AnimationSet
         setAnimation(animations.keys[0]);
     }
 
-    Sprite getSprite()
-    {
-        return sprite;
-    }
-
-    bool tick(float delta)
-    {
-        return currentAnim.tick(delta);
-    }
-
     void setAnimation(string name, bool restart=false)
     {
         if (name == currentAnimName && restart) {
@@ -70,5 +60,15 @@ class AnimationSet
             currentAnim = animations[name];
             currentAnim.restart();
         }
+    }
+
+    bool tick(float delta)
+    {
+        return currentAnim.tick(delta);
+    }
+
+    override void draw(RenderTarget target, RenderStates renderStates)
+    {
+        sprite.draw(target, renderStates);
     }
 }

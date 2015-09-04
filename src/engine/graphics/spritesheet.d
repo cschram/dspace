@@ -2,7 +2,7 @@ module engine.graphics.spritesheet;
 
 import dsfml.graphics;
 
-class SpriteSheet
+class SpriteSheet : Drawable
 {
     private Sprite   sheet;
     private Vector2i size;
@@ -27,8 +27,8 @@ class SpriteSheet
         }
     }
 
-    Sprite getSprite()
+    override void draw(RenderTarget target, RenderStates renderStates)
     {
-        return sheet;
+        sheet.draw(target, renderStates);
     }
 }

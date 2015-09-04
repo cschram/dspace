@@ -25,18 +25,18 @@ class GameOverState : State
 
     bool enter(string prev)
     {
-        return (prev == "game");
+        return (prev == "playing");
     }
 
     bool exit(string next)
     {
-        return (next == "game");
+        return (next == "playing");
     }
 
     void handleInput(Event evt)
     {
         if (evt.type == Event.EventType.KeyPressed) {
-            game.setState("game");
+            game.setState("playing");
         }
     }
 
