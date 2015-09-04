@@ -31,6 +31,6 @@ class IdleState : State
     void update(float delta)
     {
         window.clear();
-        window.display();   
+        window.display();
     }
 }

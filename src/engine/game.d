@@ -48,6 +48,16 @@ abstract class Game
         }
     }
 
+    RenderWindow getWindow()
+    {
+        return window;
+    }
+
+    bool setState(string state)
+    {
+        return stateMgr.setState(state);
+    }
+
     void close()
     {
         debug writeln("Closing...");
