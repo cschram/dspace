@@ -10,6 +10,13 @@ import engine.states.manager;
 
 abstract class Game
 {
+    //
+    // Configuration options
+    //
+    protected VideoMode cfgWindowSize     = VideoMode(800, 600);
+    protected string    cfgWindowTitle    = "D Game Engine";
+    protected uint      cfgFramerateLimit = 60;
+
     protected StateManager stateMgr;
     protected RenderWindow window;
 
@@ -17,19 +24,19 @@ abstract class Game
     {
         stateMgr = new StateManager();
 
-        initWindow();
         configure();
-    }
-
-    protected void initWindow()
-    {
-        window = new RenderWindow(VideoMode(800, 600), "D Game Engine");
-        window.setFramerateLimit(60);
+        initWindow();
     }
 
     protected void configure()
     {
         stateMgr.addState("idle", new IdleState(window));
+    }
+
+    protected void initWindow()
+    {
+        window = new RenderWindow(cfgWindowSize, cfgWindowTitle);
+        window.setFramerateLimit(cfgFramerateLimit);
     }
 
     protected void pollEvents()
