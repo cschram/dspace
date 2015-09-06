@@ -10,7 +10,7 @@ import engine.graphics.animation;
 import engine.graphics.animationset;
 import engine.util.cache;
 
-final abstract class ResourceManager
+synchronized final abstract class ResourceManager
 {
     private static immutable(float) maxAge = 60.0f;
 
@@ -36,24 +36,20 @@ final abstract class ResourceManager
 
     static void collect(float delta)
     {
-        synchronized {
-            spriteCache.collect(delta);
-            fontCache.collect(delta);
-            soundCache.collect(delta);
-            animCache.collect(delta);
-            animSetCache.collect(delta);
-        }
+        spriteCache.collect(delta);
+        fontCache.collect(delta);
+        soundCache.collect(delta);
+        animCache.collect(delta);
+        animSetCache.collect(delta);
     }
 
     static void flush()
     {
-        synchronized {
-            spriteCache.empty();
-            fontCache.empty();
-            soundCache.empty();
-            animCache.empty();
-            animSetCache.empty();
-        }
+        spriteCache.empty();
+        fontCache.empty();
+        soundCache.empty();
+        animCache.empty();
+        animSetCache.empty();
     }
 
     static JSONValue getJSON(string name)
@@ -63,72 +59,62 @@ final abstract class ResourceManager
 
     static Sprite getSprite(string name)
     {
-        synchronized {
-            auto sprite = spriteCache.get(name);
-            if (sprite is null) {
-                auto tex = new Texture();
-                if (!tex.loadFromFile(mergePath(name))) {
-                    throw new Exception("Could not load Sprite '" ~ name ~ "'.");
-                }
-                sprite = new Sprite(tex);
-                spriteCache.set(name, sprite);
+        auto sprite = spriteCache.get(name);
+        if (sprite is null) {
+            auto tex = new Texture();
+            if (!tex.loadFromFile(mergePath(name))) {
+                throw new Exception("Could not load Sprite '" ~ name ~ "'.");
             }
-            return sprite;
+            sprite = new Sprite(tex);
+            spriteCache.set(name, sprite);
         }
+        return sprite;
     }
 
     static Font getFont(string name)
     {
-        synchronized {
-            auto font = fontCache.get(name);
-            if (font is null) {
-                font = new Font();
-                if (!font.loadFromFile(mergePath(name))) {
-                    throw new Exception("Could not load Font '" ~ name ~ "'.");
-                }
-                fontCache.set(name, font);
+        auto font = fontCache.get(name);
+        if (font is null) {
+            font = new Font();
+            if (!font.loadFromFile(mergePath(name))) {
+                throw new Exception("Could not load Font '" ~ name ~ "'.");
             }
-            return font;
+            fontCache.set(name, font);
         }
+        return font;
     }
 
     static Sound getSound(string name)
     {
-        synchronized {
-            auto sound = soundCache.get(name);
-            if (sound is null) {
-                auto buf = new SoundBuffer();
-                if (!buf.loadFromFile(mergePath(name))) {
-                    throw new Exception("Could not load Sound '" ~ name ~ "'.");
-                }
-                sound = new Sound(buf);
-                soundCache.set(name, sound);
+        auto sound = soundCache.get(name);
+        if (sound is null) {
+            auto buf = new SoundBuffer();
+            if (!buf.loadFromFile(mergePath(name))) {
+                throw new Exception("Could not load Sound '" ~ name ~ "'.");
             }
-            return sound;
+            sound = new Sound(buf);
+            soundCache.set(name, sound);
         }
+        return sound;
     }
 
     static Animation getAnimation(string name)
     {
-        synchronized {
-            auto anim = animCache.get(name);
-            if (anim is null) {
-                anim = Animation.loadFromFile(mergePath(name));
-                animCache.set(name, anim);
-            }
-            return anim;
+        auto anim = animCache.get(name);
+        if (anim is null) {
+            anim = Animation.loadFromFile(mergePath(name));
+            animCache.set(name, anim);
         }
+        return anim;
     }
 
     static AnimationSet getAnimationSet(string name)
     {
-        synchronized {
-            auto animSet = animSetCache.get(name);
-            if (animSet is null) {
-                animSet = AnimationSet.loadFromFile(name);
-                animSetCache.set(name, animSet);
-            }
-            return animSet;
+        auto animSet = animSetCache.get(name);
+        if (animSet is null) {
+            animSet = AnimationSet.loadFromFile(name);
+            animSetCache.set(name, animSet);
         }
+        return animSet;
     }
 }

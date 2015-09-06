@@ -21,10 +21,23 @@ class RenderSystem : System
     {
         foreach (entity; entities.entities!(Renderable)()) {
             auto position = entity.component!(Position)().position;
-            auto target = entity.component!(Renderable)().target;
+            auto renderable = entity.component!(Renderable)();
+            auto renderTarget = renderable.target;
+
+            // Update animations
+            if (renderable.anim !is null) {
+                renderable.anim.tick(delta);
+            }
+            if (renderable.animSet !is null) {
+                renderable.animSet.tick(delta);
+            }
+
+            // Translate render state by position
             auto renderState = RenderStates.Default;
             renderState.transform.translate(position.x, position.y);
-            window.draw(target, renderState);
+
+            // Render
+            window.draw(renderTarget, renderState);
         }
     }
 }

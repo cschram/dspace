@@ -27,9 +27,9 @@ class Animation : Drawable
 
     static Animation loadFromFile(string name)
     {
-        auto json = ResourceManager.getJSON(name);
+        auto json   = ResourceManager.getJSON(name);
         auto sprite = ResourceManager.getSprite(json.object["sprite"].str);
-        auto size = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
+        auto size   = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
 
         AnimationFrame[] frames;
         auto framesJSON = json.object["frames"].array;
@@ -49,13 +49,13 @@ class Animation : Drawable
 
     this(Sprite pSprite, AnimationFrame[] pFrames, Vector2i pSize, bool pLoop)
     {
-        sprite = pSprite;
-        frames = pFrames;
-        size = pSize;
-        loop = pLoop;
-        frame = frames[0];
+        sprite      = pSprite;
+        frames      = pFrames;
+        size        = pSize;
+        loop        = pLoop;
+        frame       = frames[0];
         spriteSheet = new SpriteSheet(sprite, size, frame.spriteIndex);
-        timeDelta = 0.0f;
+        timeDelta   = 0.0f;
     }
 
     private void setFrame(uint index)
@@ -71,9 +71,9 @@ class Animation : Drawable
 
     void restart()
     {
-        timeDelta = 0;
+        timeDelta  = 0;
         frameIndex = 0;
-        finished = false;
+        finished   = false;
         setFrame(0);
     }
 

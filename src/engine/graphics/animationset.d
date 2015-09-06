@@ -12,14 +12,13 @@ class AnimationSet : Drawable
     private Sprite            sprite;
     private Vector2i          size;
     private Animation[string] animations;
-    private string            currentAnimName;
-    private Animation         currentAnim;
+    private string            current;
 
     static AnimationSet loadFromFile(string name)
     {
-        auto json = ResourceManager.getJSON(name);
+        auto json   = ResourceManager.getJSON(name);
         auto sprite = ResourceManager.getSprite(json.object["sprite"].str);
-        auto size = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
+        auto size   = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
 
         Animation[string] animations;
         auto animList = json.object["animations"].object;
@@ -45,26 +44,31 @@ class AnimationSet : Drawable
 
     this(Sprite pSprite, Vector2i pSize, Animation[string] pAnim)
     {
-        sprite = pSprite;
-        size = pSize;
+        sprite     = pSprite;
+        size       = pSize;
         animations = pAnim;
-        setAnimation(animations.keys[0]);
+        current    = animations.keys[0];
+        animations[current].restart();
     }
 
     void setAnimation(string name, bool restart=false)
     {
-        if (name == currentAnimName && restart) {
-            currentAnim.restart();
-        } else {
-            currentAnimName = name;
-            currentAnim = animations[name];
-            currentAnim.restart();
+        if (name != current) {
+            current = name;
+            animations[current].restart();
+        } else if (restart) {
+            animations[current].restart();
         }
+    }
+
+    bool isPlaying()
+    {
+        return animations[current].isPlaying();
     }
 
     bool tick(float delta)
     {
-        return currentAnim.tick(delta);
+        return animations[current].tick(delta);
     }
 
     override void draw(RenderTarget target, RenderStates renderStates)
