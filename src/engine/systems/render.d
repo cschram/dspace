@@ -26,10 +26,10 @@ class RenderSystem : System
 
             // Update animations
             if (renderable.anim !is null) {
-                renderable.anim.tick(delta);
+                renderable.anim.update(delta);
             }
             if (renderable.animSet !is null) {
-                renderable.animSet.tick(delta);
+                renderable.animSet.update(delta);
             }
 
             // Translate render state by position

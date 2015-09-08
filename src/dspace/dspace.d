@@ -9,13 +9,13 @@ import dspace.states.startmenu;
 
 class DSpace : Game
 {
-    override void initWindow()
+    override void configure()
     {
-        window = new RenderWindow(VideoMode(400, 600), "DSpace");
-        window.setFramerateLimit(60);
+        cfgVideoMode   = VideoMode(400, 600);
+        cfgWindowTitle = "DSpace";
     }
 
-    override void configure()
+    override void setupStates()
     {
         stateMgr.addState("startmenu", new StartMenuState(this));
         stateMgr.addState("playing",   new PlayingState(this));

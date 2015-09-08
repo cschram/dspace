@@ -77,7 +77,7 @@ class Animation : Drawable
         setFrame(0);
     }
 
-    bool tick(float delta)
+    bool update(float delta)
     {
         if (finished) return false;
 

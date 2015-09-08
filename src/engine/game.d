@@ -1,6 +1,6 @@
 module engine.game;
 
-import std.stdio;
+debug import std.stdio;
 
 import dsfml.graphics;
 
@@ -10,23 +10,33 @@ import engine.states.manager;
 
 abstract class Game
 {
+    //
+    // Configuration options
+    //
+    protected VideoMode cfgVideoMode      = VideoMode(800, 600);
+    protected string    cfgWindowTitle    = "D Game Engine";
+    protected uint      cfgFramerateLimit = 60;
+
+    //
+    // Internal state
+    //
     protected StateManager stateMgr;
     protected RenderWindow window;
 
     this()
     {
         stateMgr = new StateManager();
-        initWindow();
         configure();
+        window = new RenderWindow(cfgVideoMode, cfgWindowTitle);
+        window.setFramerateLimit(cfgFramerateLimit);
+        setupStates();
     }
 
-    protected void initWindow()
-    {
-        window = new RenderWindow(VideoMode(800, 600), "D Game Engine");
-        window.setFramerateLimit(60);
-    }
+    // Modify configuration options
+    protected void configure();
 
-    protected void configure()
+    // Setup main game states
+    protected void setupStates()
     {
         stateMgr.addState("idle", new IdleState(window));
     }
@@ -47,23 +57,23 @@ abstract class Game
         }
     }
 
-    RenderWindow getWindow()
+    final RenderWindow getWindow()
     {
         return window;
     }
 
-    bool setState(string state)
+    final bool setState(string state)
     {
         return stateMgr.setState(state);
     }
 
-    void close()
+    final void close()
     {
         debug writeln("Closing...");
         window.close();
     }
 
-    void run()
+    final void run()
     {
         Clock clock = new Clock();
         float delta = 0.0f;

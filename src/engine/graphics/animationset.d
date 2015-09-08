@@ -66,9 +66,9 @@ class AnimationSet : Drawable
         return animations[current].isPlaying();
     }
 
-    bool tick(float delta)
+    bool update(float delta)
     {
-        return animations[current].tick(delta);
+        return animations[current].update(delta);
     }
 
     override void draw(RenderTarget target, RenderStates renderStates)

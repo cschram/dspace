@@ -102,7 +102,7 @@ synchronized final abstract class ResourceManager
     {
         auto anim = animCache.get(name);
         if (anim is null) {
-            anim = Animation.loadFromFile(mergePath(name));
+            anim = Animation.loadFromFile(name);
             animCache.set(name, anim);
         }
         return anim;
