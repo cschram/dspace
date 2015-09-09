@@ -1,8 +1,0 @@
-{
-    "sprite": "images/drone.png",
-    "size": [17, 20],
-    "loop": false,
-    "frames": [
-        { "spriteIndex": 0, "duration": 0.0 }
-    ]
-}
