@@ -9,39 +9,42 @@ import star.entity;
 
 import engine.game;
 import engine.resourcemgr;
-import engine.spawner;
 import engine.components.bounds;
 import engine.components.position;
 import engine.components.renderable;
 import engine.components.velocity;
 import engine.graphics.animationset;
+import engine.spawn.timedarea;
 import engine.states.state;
+import engine.systems.behavior;
 import engine.systems.movement;
 import engine.systems.render;
+import dspace.spawners.enemy;
 
 class PlayingState : State
 {
     private static immutable(float) scrollSpeed = 30.0f;
     private static immutable(float) playerSpeed = 250.0f;
 
-    private Game         game;
-    private RenderWindow window;
-    private Engine       entityEngine;
-    private Sprite       background;
-    private float        backgroundPosition = 1000.0f;
-    private Text         fpsText;
-    private Entity       player;
-    private AnimationSet playerAnimSet;
-    private Velocity     playerVel;
-    private Spawner[]    spawners;
+    private Game               game;
+    private RenderWindow       window;
+    private Engine             entityEngine;
+    private Sprite             background;
+    private float              backgroundPosition = 1000.0f;
+    private Text               fpsText;
+    private Entity             player;
+    private AnimationSet       playerAnimSet;
+    private Velocity           playerVel;
+    private TimedAreaSpawner[] timedSpawners;
 
     this(Game pGame)
     {
         game         = pGame;
         window       = game.getWindow();
         entityEngine = new Engine();
-        entityEngine.systems.add(new MovementSystem(window));
-        entityEngine.systems.add(new RenderSystem(window));
+        entityEngine.systems.add(new MovementSystem(game));
+        entityEngine.systems.add(new BehaviorSystem(game));
+        entityEngine.systems.add(new RenderSystem(game));
         entityEngine.systems.configure();
 
         background = ResourceManager.getSprite("images/background.png");
@@ -68,18 +71,9 @@ class PlayingState : State
 
     void createSpawners()
     {
-        auto windowSize = window.getSize();
-        auto spawnArea = FloatRect(0, 0, windowSize.x, 0);
-        spawners ~= new Spawner(entityEngine, spawnArea, 4, EntityDetails(
-            Vector2f(17, 20),
-            "anim/drone.anim",
-            Vector2f(0, 150)
-        ));
-        spawners ~= new Spawner(entityEngine, spawnArea, 8, EntityDetails(
-            Vector2f(17, 20),
-            "anim/seraph.anim",
-            Vector2f(0, 100)
-        ));
+        auto spawnArea = FloatRect(0, 0, window.getSize().x, 0);
+        timedSpawners ~= new EnemySpawner(EnemyType.DRONE,  spawnArea);
+        timedSpawners ~= new EnemySpawner(EnemyType.SERAPH, spawnArea);
     }
 
     bool enter(string prev)
@@ -113,15 +107,16 @@ class PlayingState : State
             playerAnimSet.setAnimation("idle");
         }
 
-        foreach (spawner; spawners) {
-            spawner.update(delta);
+        foreach (spawner; timedSpawners) {
+            spawner.update(entityEngine.entities, delta);
             auto interval = spawner.getInterval();
-            if (interval > Spawner.minInterval) {
+            if (interval > TimedAreaSpawner.minInterval) {
                 spawner.setInterval(interval - (delta / 10));
             }
         }
 
         entityEngine.systems.update!(MovementSystem)(delta);
+        entityEngine.systems.update!(BehaviorSystem)(delta);
 
         auto fps = cast(uint)(1.0f / delta);
         fpsText.setString(to!dstring(format("FPS: %s", fps)));

@@ -1,4 +1,4 @@
-module engine.collision.quadtree;
+module engine.quadtree;
 
 import std.stdio;
 import std.algorithm;
@@ -127,13 +127,11 @@ class QuadTree(T)
 
     T[] retrieve(FloatRect searchArea)
     {
-        Child[] found;
+        T[] found = map!(c => c.item)(children);
         auto i = getIndex(searchArea);
         if (i > -1 && nodes.length > 0) {
-            found = nodes[i].retrieve(searchArea);
-        } else {
-            found = children;
+            found ~= nodes[i].retrieve(searchArea);
         }
-        return map!(c => c.item)(found);
+        return found;
     }
 }

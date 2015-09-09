@@ -12,16 +12,16 @@ class MovementSystem : System
 {
     RenderWindow window;
 
-    this(RenderWindow pWindow)
+    this(Game game)
     {
-        window = pWindow;
+        window = game.getWindow();
     }
 
     void configure(EventManager events) { }
 
     void update(EntityManager entities, EventManager events, double delta)
     {
-        foreach(entity; entities.entities!(Bounds, Position, Velocity)()) {
+        foreach (entity; entities.entities!(Bounds, Position, Velocity)()) {
             auto bounds   = entity.component!(Bounds)();
             auto position = entity.component!(Position)();
             auto velocity = entity.component!(Velocity)();

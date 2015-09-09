@@ -1,6 +1,6 @@
 module engine.components.entitybehavior;
 
-import engine.behaviors.behavior;
+import engine.behavior;
 
 class EntityBehavior
 {

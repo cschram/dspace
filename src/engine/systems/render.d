@@ -3,6 +3,8 @@ module engine.systems.render;
 import dsfml.graphics;
 import star.entity;
 
+import engine.game;
+import engine.components.bounds;
 import engine.components.position;
 import engine.components.renderable;
 
@@ -10,17 +12,18 @@ class RenderSystem : System
 {
     private RenderWindow window;
 
-    this(RenderWindow pWindow)
+    this(Game game)
     {
-        window = pWindow;
+        window = game.getWindow();
     }
 
     void configure(EventManager events) { }
 
     void update(EntityManager entities, EventManager events, double delta)
     {
-        foreach (entity; entities.entities!(Renderable)()) {
+        foreach (entity; entities.entities!(Bounds, Position, Renderable)()) {
             auto position = entity.component!(Position)().position;
+            auto bounds = entity.component!(Bounds)().bounds;
             auto renderable = entity.component!(Renderable)();
             auto renderTarget = renderable.target;
 
