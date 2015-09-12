@@ -59,8 +59,8 @@ class PlayingState : State
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
 
         debug {
-            auto font = ResourceManager.getFont("fonts/slkscr.ttf");
-            fpsText = new Text("FPS: 0", font, 20);
+            auto font = ResourceManager.getFont("fonts/OpenSans-Regular.ttf");
+            fpsText = new Text("FPS: 0", font, 14);
         }
 
         createPlayer();
