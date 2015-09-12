@@ -11,7 +11,7 @@ Currently I only have DSFML shared files in lib.zip for 32-bit windows and 64-bi
 
 # License
 
-Copyright (c) 2014 Corey Schram
+Copyright (c) 2015 Corey Schram
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,6 +1,7 @@
 module dspace.states.playing;
 
 debug import std.stdio;
+debug import std.math : round;
 import std.conv;
 import std.string;
 
@@ -25,19 +26,24 @@ import dspace.spawners.enemy;
 
 class PlayingState : State
 {
-    private static immutable(float) scrollSpeed = 30.0f;
-    private static immutable(float) playerSpeed = 250.0f;
+    private static immutable(float) scrollSpeed = 30.0;
+    private static immutable(float) playerSpeed = 250.0;
 
     private Game               game;
     private RenderWindow       window;
     private Engine             entityEngine;
     private Sprite             background;
-    private float              backgroundPosition = 1000.0f;
-    private Text               fpsText;
+    private float              backgroundPosition = 1000;
     private Entity             player;
     private AnimationSet       playerAnimSet;
     private Velocity           playerVel;
     private TimedAreaSpawner[] timedSpawners;
+
+    debug
+    {
+        private float fps = 60.0;
+        private Text  fpsText;
+    }
 
     this(Game pGame)
     {
@@ -52,8 +58,10 @@ class PlayingState : State
         background = ResourceManager.getSprite("images/background.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
 
-        auto font = ResourceManager.getFont("fonts/slkscr.ttf");
-        fpsText = new Text("FPS: 0", font, 20);
+        debug {
+            auto font = ResourceManager.getFont("fonts/slkscr.ttf");
+            fpsText = new Text("FPS: 0", font, 20);
+        }
 
         createPlayer();
         createSpawners();
@@ -73,7 +81,7 @@ class PlayingState : State
 
     void createSpawners()
     {
-        auto spawnArea = FloatRect(0, 0, window.getSize().x, 0);
+        auto spawnArea = FloatRect(0, -20, window.getSize().x, 0);
         timedSpawners ~= new EnemySpawner(EnemyType.DRONE,  spawnArea);
         timedSpawners ~= new EnemySpawner(EnemyType.SERAPH, spawnArea);
     }
@@ -120,13 +128,15 @@ class PlayingState : State
         entityEngine.systems.update!(MovementSystem)(delta);
         entityEngine.systems.update!(BehaviorSystem)(delta);
 
-        auto fps = cast(uint)(1.0f / delta);
-        fpsText.setString(to!dstring(format("FPS: %s", fps)));
+        debug {
+            fps = (fps * 0.9) + ((1.0 / delta) * 0.1);
+            fpsText.setString(to!dstring(format("FPS: %s", round(fps))));
+        }
 
         window.clear();
         window.draw(background);
         entityEngine.systems.update!(RenderSystem)(delta);
-        window.draw(fpsText);
+        debug window.draw(fpsText);
         window.display();
     }
 }
