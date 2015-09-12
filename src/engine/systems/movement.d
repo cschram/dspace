@@ -29,13 +29,13 @@ class MovementSystem : System
 
             if (bounds.keepInWindow) {
                 auto container = window.getSize() - Vector2f(bounds.bounds.width, bounds.bounds.height);
-                if (position.position.x < 0.0f) {
-                    position.position.x = 0.0f;
+                if (position.position.x < 0) {
+                    position.position.x = 0;
                 } else if (position.position.x > container.x) {
                     position.position.x = container.x;
                 }
-                if (position.position.y < 0.0f) {
-                    position.position.y = 0.0f;
+                if (position.position.y < 0) {
+                    position.position.y = 0;
                 } else if (position.position.y > container.y) {
                     position.position.y = container.y;
                 }

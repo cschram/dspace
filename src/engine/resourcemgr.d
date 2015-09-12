@@ -12,7 +12,7 @@ import engine.util.cache;
 
 synchronized final abstract class ResourceManager
 {
-    private static immutable(float) maxAge = 60.0f;
+    private static immutable(float) maxAge = 60;
 
     private __gshared Cache!Sprite       spriteCache;
     private __gshared Cache!Font         fontCache;

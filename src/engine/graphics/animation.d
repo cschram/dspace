@@ -55,7 +55,7 @@ class Animation : Drawable
         loop        = pLoop;
         frame       = frames[0];
         spriteSheet = new SpriteSheet(sprite, size, frame.spriteIndex);
-        timeDelta   = 0.0f;
+        timeDelta   = 0;
     }
 
     private void setFrame(uint index)

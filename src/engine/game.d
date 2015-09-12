@@ -75,16 +75,16 @@ abstract class Game
 
     final void run()
     {
-        Clock clock = new Clock();
-        float delta = 0.0f;
-        float cacheTimer = 1.0f;
+        Clock clock      = new Clock();
+        float delta      = 0;
+        float cacheTimer = 1;
 
         debug writeln("Starting...");
         while (window.isOpen()) {
             cacheTimer -= delta;
-            if (cacheTimer <= 0.0f) {
+            if (cacheTimer <= 0) {
                 ResourceManager.collect(delta);
-                cacheTimer = 1.0f;
+                cacheTimer = 1;
             }
 
             pollEvents();

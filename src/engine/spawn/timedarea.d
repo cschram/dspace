@@ -8,11 +8,11 @@ import engine.spawn.spawner;
 
 class TimedAreaSpawner : SpawnArea
 {
-    static immutable(float) minInterval = 0.05f;
+    static immutable(float) minInterval = 0.05;
 
     protected float         interval;
     protected EntityDetails details;
-    private   float         timer = 0.0f;
+    private   float         timer = 0;
 
     this(FloatRect pSpawnArea, float pInterval, EntityDetails pDetails)
     {

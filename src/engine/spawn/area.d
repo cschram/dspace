@@ -19,12 +19,12 @@ class SpawnArea : Spawner
     private Vector2f getRandomPos()
     {
         float left, top;
-        if (spawnArea.width <= 0.0f) {
+        if (spawnArea.width <= 0) {
             left = spawnArea.left;
         } else {
             left = uniform(spawnArea.left, spawnArea.left + spawnArea.width);
         }
-        if (spawnArea.height <= 0.0f) {
+        if (spawnArea.height <= 0) {
             top = spawnArea.top;
         } else {
             top = uniform(spawnArea.top, spawnArea.top + spawnArea.height);

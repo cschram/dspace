@@ -26,8 +26,8 @@ import dspace.spawners.enemy;
 
 class PlayingState : State
 {
-    private static immutable(float) scrollSpeed = 30.0;
-    private static immutable(float) playerSpeed = 250.0;
+    private static immutable(float) scrollSpeed = 30;
+    private static immutable(float) playerSpeed = 250;
 
     private Game               game;
     private RenderWindow       window;
@@ -41,7 +41,7 @@ class PlayingState : State
 
     debug
     {
-        private float fps = 60.0;
+        private float fps = 60;
         private Text  fpsText;
     }
 
@@ -129,7 +129,7 @@ class PlayingState : State
         entityEngine.systems.update!(BehaviorSystem)(delta);
 
         debug {
-            fps = (fps * 0.9) + ((1.0 / delta) * 0.1);
+            fps = (fps * 0.9) + ((1 / delta) * 0.1);
             fpsText.setString(to!dstring(format("FPS: %s", round(fps))));
         }
 
