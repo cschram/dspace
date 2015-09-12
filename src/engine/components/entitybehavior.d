@@ -10,4 +10,9 @@ class EntityBehavior
     {
         behavior = pBehavior;
     }
+
+    invariant
+    {
+        assert(behavior !is null);
+    }
 }

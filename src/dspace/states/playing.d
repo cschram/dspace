@@ -10,6 +10,7 @@ import star.entity;
 import engine.game;
 import engine.resourcemgr;
 import engine.components.bounds;
+import engine.components.entitybehavior;
 import engine.components.position;
 import engine.components.renderable;
 import engine.components.velocity;
@@ -19,6 +20,7 @@ import engine.states.state;
 import engine.systems.behavior;
 import engine.systems.movement;
 import engine.systems.render;
+import dspace.behaviors.enemy;
 import dspace.spawners.enemy;
 
 class PlayingState : State

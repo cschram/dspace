@@ -1,7 +1,14 @@
+# Folders
 .dub/
+bin/
+content/
+lib/
+
+# Files
+.DS_Store
 dub.selections.json
-/lib/
-/bin/dspace
+
+# Extensions
 *.exe
 *.dll
 *.lib

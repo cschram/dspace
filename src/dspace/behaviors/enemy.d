@@ -1,7 +1,5 @@
 module dspace.behaviors.enemy;
 
-debug import std.stdio;
-
 import dsfml.graphics;
 import star.entity;
 
@@ -16,7 +14,6 @@ class EnemyBehavior : Behavior
     {
         auto position = entity.component!(Position)().position;
         if (position.y > game.getWindow().getSize().y) {
-            debug writeln("Destroying enemy");
             entity.destroy();
         }
     }
