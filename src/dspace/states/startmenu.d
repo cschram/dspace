@@ -21,9 +21,9 @@ class StartMenuState : State
         background = ResourceManager.getSprite("images/background.png");
         background.textureRect = IntRect(0, 1000, 400, 600);
 
-        auto font = ResourceManager.getFont("fonts/slkscr.ttf");
+        auto font = ResourceManager.getFont("fonts/OpenSans-Regular.ttf");
         startText = new Text("Press Space to Start", font, 30);
-        startText.position = Vector2f(8, 270);
+        startText.position = Vector2f(55, 270);
     }
 
     bool enter(string prev)

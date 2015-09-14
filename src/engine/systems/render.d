@@ -8,19 +8,50 @@ import engine.components.bounds;
 import engine.components.position;
 import engine.components.renderable;
 
+debug
+{
+    import std.conv;
+    import std.string;
+    import std.math : round;
+    import engine.resourcemgr;
+
+    immutable(Vector2f) debugInfoPosition = Vector2f(0, 0);
+}
+
 class RenderSystem : System
 {
     private RenderWindow window;
 
+    debug
+    {
+        private float fps = 60;
+        private Text  fpsText;
+        private Text  objectsText;
+    }
+
     this(Game game)
     {
         window = game.getWindow();
+
+        debug {
+            auto font = ResourceManager.getFont("fonts/OpenSans-Regular.ttf");
+            fpsText = new Text("FPS: 0", font, 14);
+            fpsText.position = debugInfoPosition;
+            objectsText = new Text("Objects: 0", font, 14);
+            objectsText.position = debugInfoPosition + Vector2f(0, 16);
+        }
     }
 
     void configure(EventManager events) { }
 
     void update(EntityManager entities, EventManager events, double delta)
     {
+        debug {
+            int renderedCount = 0;
+            fps = (fps * 0.9) + ((1 / delta) * 0.1);
+            fpsText.setString(to!dstring(format("FPS: %s", round(fps))));
+        }
+
         foreach (entity; entities.entities!(Bounds, Position, Renderable)()) {
             auto position = entity.component!(Position)().position;
             auto bounds = entity.component!(Bounds)().bounds;
@@ -41,6 +72,14 @@ class RenderSystem : System
 
             // Render
             window.draw(renderTarget, renderState);
+
+            debug renderedCount++;
+        }
+
+        debug {
+            objectsText.setString(to!dstring(format("Objects: %s", renderedCount)));
+            window.draw(fpsText);
+            window.draw(objectsText);
         }
     }
 }

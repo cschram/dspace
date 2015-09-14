@@ -1,10 +1,5 @@
 module dspace.states.playing;
 
-debug import std.stdio;
-debug import std.math : round;
-import std.conv;
-import std.string;
-
 import dsfml.graphics;
 import star.entity;
 
@@ -39,12 +34,6 @@ class PlayingState : State
     private Velocity           playerVel;
     private TimedAreaSpawner[] timedSpawners;
 
-    debug
-    {
-        private float fps = 60;
-        private Text  fpsText;
-    }
-
     this(Game pGame)
     {
         game         = pGame;
@@ -57,11 +46,6 @@ class PlayingState : State
 
         background = ResourceManager.getSprite("images/background.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
-
-        debug {
-            auto font = ResourceManager.getFont("fonts/OpenSans-Regular.ttf");
-            fpsText = new Text("FPS: 0", font, 14);
-        }
 
         createPlayer();
         createSpawners();
@@ -128,15 +112,9 @@ class PlayingState : State
         entityEngine.systems.update!(MovementSystem)(delta);
         entityEngine.systems.update!(BehaviorSystem)(delta);
 
-        debug {
-            fps = (fps * 0.9) + ((1 / delta) * 0.1);
-            fpsText.setString(to!dstring(format("FPS: %s", round(fps))));
-        }
-
         window.clear();
         window.draw(background);
         entityEngine.systems.update!(RenderSystem)(delta);
-        debug window.draw(fpsText);
         window.display();
     }
 }
