@@ -4,12 +4,10 @@ import dsfml.graphics;
 import star.entity;
 
 import engine.game;
-import engine.components.bounds;
 import engine.components.position;
 import engine.components.renderable;
 
-debug
-{
+debug {
     import std.conv;
     import std.string;
     import std.math : round;
@@ -22,8 +20,7 @@ class RenderSystem : System
 {
     private RenderWindow window;
 
-    debug
-    {
+    debug {
         private float fps = 60;
         private Text  fpsText;
         private Text  objectsText;
@@ -52,9 +49,8 @@ class RenderSystem : System
             fpsText.setString(to!dstring(format("FPS: %s", round(fps))));
         }
 
-        foreach (entity; entities.entities!(Bounds, Position, Renderable)()) {
+        foreach (entity; entities.entities!(Position, Renderable)()) {
             auto position = entity.component!(Position)().position;
-            auto bounds = entity.component!(Bounds)().bounds;
             auto renderable = entity.component!(Renderable)();
             auto renderTarget = renderable.target;
 

@@ -4,12 +4,12 @@ import dsfml.graphics;
 import star.entity;
 
 import engine.resourcemgr;
-import engine.components.bounds;
-import engine.components.entitybehavior;
+import engine.components.controller;
+import engine.components.physics;
 import engine.components.renderable;
 import engine.spawn.spawner;
 import engine.spawn.timedarea;
-import dspace.behaviors.enemy;
+import dspace.controllers.enemy;
 
 enum EnemyType
 {
@@ -21,7 +21,7 @@ class EnemySpawner : TimedAreaSpawner
 {
     private EnemyType type;
 
-    this(EnemyType pType, FloatRect pSpawnArea)
+    this(EntityManager entities, EnemyType pType, FloatRect pSpawnArea)
     {
         type = pType;
         float interval;
@@ -34,14 +34,17 @@ class EnemySpawner : TimedAreaSpawner
             details = EntityDetails(Vector2f(0, 0), Vector2f(0, 100));
         }
         pSpawnArea.width -= 17;
-        super(pSpawnArea, interval, details);
+        super(entities, pSpawnArea, interval, details);
     }
 
     override void configureEntity(Entity entity, EntityDetails details)
     {
         super.configureEntity(entity, details);
-        entity.add(new Bounds(17, 20));
-        entity.add(new EntityBehavior(new EnemyBehavior()));
+
+        auto physics = entity.component!Physics();
+        physics.size = Vector2f(17, 20);
+
+        entity.add(new EntityController(new EnemyController()));
         if (type == EnemyType.DRONE) {
             entity.add(new Renderable(ResourceManager.getSprite("images/drone.png")));
         } else if (type == EnemyType.SERAPH) {

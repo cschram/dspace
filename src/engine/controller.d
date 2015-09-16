@@ -1,10 +1,10 @@
-module engine.behavior;
+module engine.controller;
 
 import star.entity;
 
 import engine.game;
 
-interface Behavior
+interface Controller
 {
     void update(Game game, Entity entity, float delta);
 }

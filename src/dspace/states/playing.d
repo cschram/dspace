@@ -5,24 +5,23 @@ import star.entity;
 
 import engine.game;
 import engine.resourcemgr;
-import engine.components.bounds;
-import engine.components.entitybehavior;
+import engine.components.controller;
+import engine.components.physics;
 import engine.components.position;
 import engine.components.renderable;
-import engine.components.velocity;
 import engine.graphics.animationset;
 import engine.spawn.timedarea;
 import engine.states.state;
-import engine.systems.behavior;
-import engine.systems.movement;
+import engine.systems.controller;
+import engine.systems.physics;
 import engine.systems.render;
-import dspace.behaviors.enemy;
+import dspace.controllers.enemy;
+import dspace.controllers.player;
 import dspace.spawners.enemy;
 
 class PlayingState : State
 {
     private static immutable(float) scrollSpeed = 30;
-    private static immutable(float) playerSpeed = 250;
 
     private Game               game;
     private RenderWindow       window;
@@ -31,7 +30,6 @@ class PlayingState : State
     private float              backgroundPosition = 1000;
     private Entity             player;
     private AnimationSet       playerAnimSet;
-    private Velocity           playerVel;
     private TimedAreaSpawner[] timedSpawners;
 
     this(Game pGame)
@@ -39,8 +37,8 @@ class PlayingState : State
         game         = pGame;
         window       = game.getWindow();
         entityEngine = new Engine();
-        entityEngine.systems.add(new MovementSystem(game));
-        entityEngine.systems.add(new BehaviorSystem(game));
+        entityEngine.systems.add(new ControllerSystem(game));
+        entityEngine.systems.add(new PhysicsSystem(game));
         entityEngine.systems.add(new RenderSystem(game));
         entityEngine.systems.configure();
 
@@ -55,19 +53,18 @@ class PlayingState : State
     {
         player        = entityEngine.entities.create();
         playerAnimSet = ResourceManager.getAnimationSet("anim/player.animset");
-        playerVel     = new Velocity(0, 0);
 
-        player.add(new Bounds(55, 61, true));
+        player.add(new Physics(Vector2f(55, 61), Vector2f(0, 0), Vector2f(0, 0), true));
         player.add(new Position(172.5, 539));
         player.add(new Renderable(playerAnimSet));
-        player.add(playerVel);
+        player.add(new EntityController(new PlayerController(entityEngine.entities)));
     }
 
     void createSpawners()
     {
         auto spawnArea = FloatRect(0, -20, window.getSize().x, 0);
-        timedSpawners ~= new EnemySpawner(EnemyType.DRONE,  spawnArea);
-        timedSpawners ~= new EnemySpawner(EnemyType.SERAPH, spawnArea);
+        timedSpawners ~= new EnemySpawner(entityEngine.entities, EnemyType.DRONE,  spawnArea);
+        timedSpawners ~= new EnemySpawner(entityEngine.entities, EnemyType.SERAPH, spawnArea);
     }
 
     bool enter(string prev)
@@ -90,27 +87,16 @@ class PlayingState : State
             background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
         }
 
-        if (Keyboard.isKeyPressed(Keyboard.Key.Left)) {
-            playerVel.velocity.x = -playerSpeed;
-            playerAnimSet.setAnimation("bank-left");
-        } else if (Keyboard.isKeyPressed(Keyboard.Key.Right)) {
-            playerVel.velocity.x = playerSpeed;
-            playerAnimSet.setAnimation("bank-right");
-        } else {
-            playerVel.velocity.x = 0;
-            playerAnimSet.setAnimation("idle");
-        }
-
         foreach (spawner; timedSpawners) {
-            spawner.update(entityEngine.entities, delta);
+            spawner.update(delta);
             auto interval = spawner.getInterval();
             if (interval > TimedAreaSpawner.minInterval) {
                 spawner.setInterval(interval - (delta / 10));
             }
         }
 
-        entityEngine.systems.update!(MovementSystem)(delta);
-        entityEngine.systems.update!(BehaviorSystem)(delta);
+        entityEngine.systems.update!(PhysicsSystem)(delta);
+        entityEngine.systems.update!(ControllerSystem)(delta);
 
         window.clear();
         window.draw(background);

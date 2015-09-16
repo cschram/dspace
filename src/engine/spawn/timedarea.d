@@ -8,15 +8,15 @@ import engine.spawn.spawner;
 
 class TimedAreaSpawner : SpawnArea
 {
-    static immutable(float) minInterval = 0.01;
+    static immutable(float) minInterval = 0.05;
 
     protected float         interval;
     protected EntityDetails details;
     private   float         timer = 0;
 
-    this(FloatRect pSpawnArea, float pInterval, EntityDetails pDetails)
+    this(EntityManager entities, FloatRect spawnArea, float pInterval, EntityDetails pDetails)
     {
-        super(pSpawnArea);
+        super(entities, spawnArea);
         interval = pInterval;
         details  = pDetails;
     }
@@ -35,11 +35,11 @@ class TimedAreaSpawner : SpawnArea
         }
     }
 
-    final void update(EntityManager entities, float delta)
+    final void update(float delta)
     {
         timer += delta;
         if (timer >= interval) {
-            spawn(entities, details);
+            spawn(details);
             timer = 0;
         }
     }

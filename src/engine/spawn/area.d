@@ -11,8 +11,9 @@ class SpawnArea : Spawner
 {
     private FloatRect spawnArea;
 
-    this(FloatRect pSpawnArea)
+    this(EntityManager entities, FloatRect pSpawnArea)
     {
+        super(entities);
         spawnArea = pSpawnArea;
     }
 

@@ -2,6 +2,7 @@ module engine.quadtree;
 
 import std.stdio;
 import std.algorithm;
+import std.array;
 
 import dsfml.graphics;
 
@@ -16,15 +17,15 @@ class QuadTree(T)
     private static immutable(int) maxChildren = 10;
     private static immutable(int) maxLevels   = 5;
 
+    private FloatRect  bounds;
     private int        level;
     private Child[]    children;
-    private FloatRect  bounds;
     private QuadTree[] nodes;
 
-    this(int pLevel, FloatRect pBounds)
+    this(FloatRect pBounds, int pLevel=0)
     {
-        level = pLevel;
         bounds = pBounds;
+        level  = pLevel;
     }
 
     // Determine which subtree to place an object in.
@@ -64,7 +65,7 @@ class QuadTree(T)
 
     void clear()
     {
-        entities = [];
+        children = [];
         if (nodes.length > 0) {
             foreach(node; nodes) {
                 node.clear();
@@ -82,13 +83,13 @@ class QuadTree(T)
 
         nodes = [
             // Top left
-            new QuadTree(level + 1, FloatRect(x, y, w, h)),
+            new QuadTree(FloatRect(x, y, w, h), level + 1),
             // Top right
-            new QuadTree(level + 1, FloatRect(x + w, y, w, h)),
+            new QuadTree(FloatRect(x + w, y, w, h), level + 1),
             // Bottom left
-            new QuadTree(level + 1, FloatRect(x, y + h, w, h)),
+            new QuadTree(FloatRect(x, y + h, w, h), level + 1),
             // Bottom right
-            new QuadTree(level + 1, FloatRect(x + w, y + h, w, h))
+            new QuadTree(FloatRect(x + w, y + h, w, h), level + 1)
         ];
     }
 
@@ -127,7 +128,7 @@ class QuadTree(T)
 
     T[] retrieve(FloatRect searchArea)
     {
-        T[] found = map!(c => c.item)(children);
+        T[] found = array(map!(c => c.item)(children));
         auto i = getIndex(searchArea);
         if (i > -1 && nodes.length > 0) {
             found ~= nodes[i].retrieve(searchArea);
