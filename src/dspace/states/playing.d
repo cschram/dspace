@@ -54,7 +54,13 @@ class PlayingState : State
         player        = entityEngine.entities.create();
         playerAnimSet = ResourceManager.getAnimationSet("anim/player.animset");
 
-        player.add(new Physics(Vector2f(55, 61), Vector2f(0, 0), Vector2f(0, 0), true));
+        player.add(new Physics(Vector2f(55, 61),
+                               Vector2f(0, 0),
+                               Vector2f(0, 0),
+                               CollisionMode.PASSIVE,
+                               CollisionGroup.A,
+                               CollisionGroup.BOTH,
+                               true));
         player.add(new Position(172.5, 539));
         player.add(new Renderable(playerAnimSet));
         player.add(new EntityController(new PlayerController(entityEngine.entities)));

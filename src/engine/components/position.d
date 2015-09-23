@@ -5,6 +5,7 @@ import dsfml.system;
 class Position
 {
     Vector2f position;
+    Vector2f lastPosition;
 
     this(Vector2f pPosition)
     {

@@ -22,21 +22,12 @@ class PhysicsSystem : System
 
     void configure(EventManager events) { }
 
-    void updateTree(EntityManager entities)
-    {
-        tree.clear();
-        foreach (entity; entities.entities!(Physics, Position)()) {
-            auto position = entity.component!Position().position;
-            auto bounds   = entity.component!Physics().getBounds(position);
-            tree.insert(bounds, entity);
-        }
-    }
-
     void moveEntities(EntityManager entities, float delta)
     {
         foreach (entity; entities.entities!(Physics, Position)()) {
             auto physics  = entity.component!Physics();
             auto position = entity.component!Position();
+            position.lastPosition = position.position;
             position.position += physics.velocity * delta;
 
             if (physics.keepInWindow) {
@@ -52,12 +43,14 @@ class PhysicsSystem : System
                     position.position.y = container.y;
                 }
             }
+
+            tree.insert(physics.getBounds(position.position), entity);
         }
     }
 
     void update(EntityManager entities, EventManager events, double delta)
     {
-        updateTree(entities);
+        tree.clear();
         moveEntities(entities, delta);
     }
 }
