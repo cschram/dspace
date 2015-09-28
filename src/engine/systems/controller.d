@@ -20,7 +20,7 @@ class ControllerSystem : System
     {
         foreach (entity; entities.entities!(EntityController)()) {
             auto controller = entity.component!(EntityController)().controller;
-            controller.update(game, entity, delta);
+            controller.update(entity, game, delta);
         }
     }
 }

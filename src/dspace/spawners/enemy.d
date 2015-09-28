@@ -44,10 +44,11 @@ class EnemySpawner : TimedAreaSpawner
         auto physics = entity.component!Physics();
         physics.size = Vector2f(17, 20);
 
-        entity.add(new EntityController(new EnemyController()));
         if (type == EnemyType.DRONE) {
+            entity.add(new EntityController(new EnemyController(1)));
             entity.add(new Renderable(ResourceManager.getSprite("images/drone.png")));
         } else if (type == EnemyType.SERAPH) {
+            entity.add(new EntityController(new EnemyController(2)));
             entity.add(new Renderable(ResourceManager.getSprite("images/seraph.png")));
         }
     }

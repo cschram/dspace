@@ -6,5 +6,6 @@ import engine.game;
 
 interface Controller
 {
-    void update(Game game, Entity entity, float delta);
+    void collide(Entity entity, Entity target);
+    void update(Entity entity, Game game, float delta);
 }

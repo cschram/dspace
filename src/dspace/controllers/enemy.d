@@ -9,8 +9,25 @@ import engine.components.position;
 
 class EnemyController : Controller
 {
-    void update(Game game, Entity entity, float delta)
+    private int health;
+
+    this(int pHealth)
     {
+        health = pHealth;
+    }
+
+    void collide(Entity entity, Entity target)
+    {
+        health -= 1;
+    }
+
+    void update(Entity entity, Game game, float delta)
+    {
+        if (health <= 0) {
+            entity.destroy();
+            return;
+        }
+
         auto position = entity.component!Position().position;
         if (position.y > game.getWindow().getSize().y) {
             entity.destroy();

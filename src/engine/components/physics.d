@@ -14,10 +14,9 @@ enum CollisionMode
 
 enum CollisionGroup
 {
-    NONE = 0,
-    A    = 1,
-    B    = 2,
-    BOTH = 3
+    A    = 0,
+    B    = 1,
+    BOTH = 2
 }
 
 struct Collision

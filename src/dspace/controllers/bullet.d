@@ -9,8 +9,20 @@ import engine.components.position;
 
 class BulletController : Controller
 {
-    void update(Game game, Entity entity, float delta)
+    bool hasHit = false;
+
+    void collide(Entity entity, Entity target)
     {
+        hasHit = true;
+    }
+
+    void update(Entity entity, Game, float delta)
+    {
+        if (hasHit) {
+            entity.destroy();
+            return;
+        }
+
         auto position = entity.component!Position().position;
         if (position.y < -8) {
             entity.destroy();

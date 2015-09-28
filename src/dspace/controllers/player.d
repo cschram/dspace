@@ -20,13 +20,25 @@ class PlayerController : Controller
     private BulletSpawner bulletSpawner;
     private float         shootCooldownTimer = 0.1;
 
+    private uint health = 10;
+
     this(EntityManager entities)
     {
         bulletSpawner = new BulletSpawner(entities, Direction.UP);
     }
 
-    void update(Game game, Entity entity, float delta)
+    void collide(Entity entity, Entity target)
     {
+        health -= 1;
+    }
+
+    void update(Entity entity, Game game, float delta)
+    {
+        if (health <= 0) {
+            game.setState("gameover");
+            return;
+        }
+
         auto physics = entity.component!Physics();
         auto animSet = entity.component!Renderable().animSet;
 
