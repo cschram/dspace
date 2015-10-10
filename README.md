@@ -1,6 +1,6 @@
 # DSpace
 
-DSpace is a little space shmup game. It's a rewrite of a game I made a few years ago, this time written in D mostly as an excersize to learn the language and game programming patterns.
+DSpace is a little space shmup game. It's a rewrite of a game I made a few years ago, this time written in D mostly as an exercise to learn the language and game programming patterns.
 
 ```
 $ unzip lib.zip
