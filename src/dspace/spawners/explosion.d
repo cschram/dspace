@@ -4,6 +4,7 @@ import dsfml.audio;
 import dsfml.graphics;
 import star.entity;
 
+import engine.components.controller;
 import engine.components.position;
 import engine.components.renderable;
 import engine.graphics.animation;
@@ -20,7 +21,8 @@ class ExplosionSpawner : Spawner
 
     override protected void configureEntity(Entity entity, EntityDetails details)
     {
+        entity.add(new Position(details.position));
         entity.add(new Renderable(Animation.loadFromFile("anim/explosion.anim")));
-        //entity.add(new AnimationController());
+        entity.add(new EntityController(new AnimationController()));
     }
 }

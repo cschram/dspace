@@ -1,5 +1,6 @@
 module dspace.controllers.animation;
 
+debug import std.stdio;
 import star.entity;
 
 import engine.controller;

@@ -1,5 +1,6 @@
 module engine.graphics.animation;
 
+debug import std.stdio;
 import std.json;
 
 import dsfml.audio;
@@ -16,6 +17,7 @@ struct AnimationFrame
 
 class Animation : Drawable
 {
+    private string           name;
     private AnimationFrame[] frames;
     private Sprite           sprite;
     private SpriteSheet      spriteSheet;
@@ -29,13 +31,13 @@ class Animation : Drawable
 
     static Animation loadFromFile(string name)
     {
-        auto json     = ResourceManager.getJSON(name);
-        auto sprite   = ResourceManager.getSprite(json.object["sprite"].str);
-        auto size     = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
+        auto json     = ResourceManager.getJSON(name).object;
+        auto sprite   = ResourceManager.getSprite(json["sprite"].str);
+        auto size     = Vector2i(cast(int)json["size"][0].integer, cast(int)json["size"][1].integer);
         Sound bgAudio = null;
 
         AnimationFrame[] frames;
-        auto framesJSON = json.object["frames"].array;
+        auto framesJSON = json["frames"].array;
         for (size_t i = 0; i < framesJSON.length; i++) {
             frames ~= AnimationFrame(
                 cast(uint)framesJSON[i].object["spriteIndex"].integer,
@@ -43,22 +45,23 @@ class Animation : Drawable
             );
         }
 
-        if (!json.object["audio"].isNull()) {
-            bgAudio = ResourceManager.getSound(json.object["audio"].object["sound"].str);
-            if (json.object["audio"].object["loop"].type == JSON_TYPE.TRUE) {
+        if ("audio" in json) {
+            bgAudio = ResourceManager.getSound(json["audio"].object["sound"].str);
+            if (json["audio"].object["loop"].type == JSON_TYPE.TRUE) {
                 bgAudio.isLooping = true;
             }
         }
 
-        if (json.object["loop"].type == JSON_TYPE.TRUE) {
-            return new Animation(sprite, frames, size, true, bgAudio);
+        if (json["loop"].type == JSON_TYPE.TRUE) {
+            return new Animation(name, sprite, frames, size, true, bgAudio);
         } else {
-            return new Animation(sprite, frames, size, false, bgAudio);
+            return new Animation(name, sprite, frames, size, false, bgAudio);
         }
     }
 
-    this(Sprite pSprite, AnimationFrame[] pFrames, Vector2i pSize, bool pLoop, Sound pAudio=null)
+    this(string pName, Sprite pSprite, AnimationFrame[] pFrames, Vector2i pSize, bool pLoop, Sound pAudio=null)
     {
+        name        = pName;
         sprite      = pSprite;
         frames      = pFrames;
         size        = pSize;

@@ -2,6 +2,7 @@ module engine.graphics.animationset;
 
 import std.json;
 
+import dsfml.audio;
 import dsfml.graphics;
 
 import engine.resourcemgr;
@@ -16,14 +17,15 @@ class AnimationSet : Drawable
 
     static AnimationSet loadFromFile(string name)
     {
-        auto json   = ResourceManager.getJSON(name);
-        auto sprite = ResourceManager.getSprite(json.object["sprite"].str);
-        auto size   = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
+        auto json   = ResourceManager.getJSON(name).object;
+        auto sprite = ResourceManager.getSprite(json["sprite"].str);
+        auto size   = Vector2i(cast(int)json["size"][0].integer, cast(int)json["size"][1].integer);
 
         Animation[string] animations;
-        auto animList = json.object["animations"].object;
+        auto animList = json["animations"].object;
         foreach (string animName, JSONValue animJSON; animList) {
             AnimationFrame[] frames;
+            Sound bgAudio = null;
             auto framesJSON = animJSON.object["frames"].array;
             for (size_t i = 0; i < framesJSON.length; i++) {
                 frames ~= AnimationFrame(
@@ -32,10 +34,17 @@ class AnimationSet : Drawable
                 );
             }
 
+            if ("audio" in animJSON.object) {
+                bgAudio = ResourceManager.getSound(animJSON.object["audio"].object["sound"].str);
+                if (animJSON.object["audio"].object["loop"].type == JSON_TYPE.TRUE) {
+                    bgAudio.isLooping = true;
+                }
+            }
+
             if (animJSON.object["loop"].type == JSON_TYPE.TRUE) {
-                animations[animName] = new Animation(sprite, frames, size, true);
+                animations[animName] = new Animation(name, sprite, frames, size, true, bgAudio);
             } else {
-                animations[animName] = new Animation(sprite, frames, size, false);
+                animations[animName] = new Animation(name, sprite, frames, size, false, bgAudio);
             }
         }
 

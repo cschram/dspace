@@ -1,5 +1,6 @@
 module engine.components.renderable;
 
+debug import std.stdio;
 import dsfml.graphics;
 
 import engine.graphics.animation;
