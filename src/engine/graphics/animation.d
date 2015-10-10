@@ -2,6 +2,7 @@ module engine.graphics.animation;
 
 import std.json;
 
+import dsfml.audio;
 import dsfml.graphics;
 
 import engine.resourcemgr;
@@ -20,6 +21,7 @@ class Animation : Drawable
     private SpriteSheet      spriteSheet;
     private Vector2i         size;
     private bool             loop;
+    private Sound            bgAudio;
     private bool             finished;
     private float            timeDelta;
     private uint             frameIndex;
@@ -27,9 +29,10 @@ class Animation : Drawable
 
     static Animation loadFromFile(string name)
     {
-        auto json   = ResourceManager.getJSON(name);
-        auto sprite = ResourceManager.getSprite(json.object["sprite"].str);
-        auto size   = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
+        auto json     = ResourceManager.getJSON(name);
+        auto sprite   = ResourceManager.getSprite(json.object["sprite"].str);
+        auto size     = Vector2i(cast(int)json.object["size"][0].integer, cast(int)json.object["size"][1].integer);
+        Sound bgAudio = null;
 
         AnimationFrame[] frames;
         auto framesJSON = json.object["frames"].array;
@@ -40,22 +43,34 @@ class Animation : Drawable
             );
         }
 
+        if (!json.object["audio"].isNull()) {
+            bgAudio = ResourceManager.getSound(json.object["audio"].object["sound"].str);
+            if (json.object["audio"].object["loop"].type == JSON_TYPE.TRUE) {
+                bgAudio.isLooping = true;
+            }
+        }
+
         if (json.object["loop"].type == JSON_TYPE.TRUE) {
-            return new Animation(sprite, frames, size, true);
+            return new Animation(sprite, frames, size, true, bgAudio);
         } else {
-            return new Animation(sprite, frames, size, false);
+            return new Animation(sprite, frames, size, false, bgAudio);
         }
     }
 
-    this(Sprite pSprite, AnimationFrame[] pFrames, Vector2i pSize, bool pLoop)
+    this(Sprite pSprite, AnimationFrame[] pFrames, Vector2i pSize, bool pLoop, Sound pAudio=null)
     {
         sprite      = pSprite;
         frames      = pFrames;
         size        = pSize;
         loop        = pLoop;
+        bgAudio     = pAudio;
         frame       = frames[0];
         spriteSheet = new SpriteSheet(sprite, size, frame.spriteIndex);
         timeDelta   = 0;
+
+        if (bgAudio !is null) {
+            bgAudio.play();
+        }
     }
 
     private void setFrame(uint index)
@@ -75,6 +90,10 @@ class Animation : Drawable
         frameIndex = 0;
         finished   = false;
         setFrame(0);
+
+        if (bgAudio !is null) {
+            bgAudio.play();
+        }
     }
 
     bool update(float delta)

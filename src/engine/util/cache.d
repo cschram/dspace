@@ -30,7 +30,6 @@ class Cache(T)
             if (item.age >= maxAge) {
                 debug writeln("Cleaning up " ~ name);
                 items.remove(name);
-                delete item;
             }
         }
     }
@@ -39,22 +38,31 @@ class Cache(T)
     {
         foreach (string name, CacheItem!T item; items) {
             items.remove(name);
-            delete item;
+        }
+    }
+
+    bool has(string name)
+    {
+        if (name in items) {
+            return true;
+        } else {
+            return false;
         }
     }
 
     T get(string name)
+    in
     {
-        if (name in items) {
-            return items[name].data;
-        }
-        return null;
+        assert(has(name));
+    }
+    body
+    {
+        return items[name].data;
     }
 
     void set(string name, T item)
     {
         if (name in items) {
-            delete items[name].data;
             items[name].age = 0;
             items[name].data = item;
         } else {

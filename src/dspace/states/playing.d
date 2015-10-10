@@ -52,7 +52,7 @@ class PlayingState : State
     void createPlayer()
     {
         player        = entityEngine.entities.create();
-        playerAnimSet = ResourceManager.getAnimationSet("anim/player.animset");
+        playerAnimSet = AnimationSet.loadFromFile("anim/player.animset");
 
         player.add(new Physics(Vector2f(55, 61),
                                Vector2f(0, 0),

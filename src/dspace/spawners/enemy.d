@@ -10,6 +10,7 @@ import engine.components.renderable;
 import engine.spawn.spawner;
 import engine.spawn.timedarea;
 import dspace.controllers.enemy;
+import dspace.spawners.explosion;
 
 enum EnemyType
 {
@@ -20,10 +21,12 @@ enum EnemyType
 class EnemySpawner : TimedAreaSpawner
 {
     private EnemyType type;
+    private ExplosionSpawner explosionSpawn;
 
     this(EntityManager entities, EnemyType pType, FloatRect pSpawnArea)
     {
         type = pType;
+        explosionSpawn = new ExplosionSpawner(entities);
         float interval;
         EntityDetails details;
         if (type == EnemyType.DRONE) {
@@ -45,10 +48,10 @@ class EnemySpawner : TimedAreaSpawner
         physics.size = Vector2f(17, 20);
 
         if (type == EnemyType.DRONE) {
-            entity.add(new EntityController(new EnemyController(1)));
+            entity.add(new EntityController(new EnemyController(1, explosionSpawn)));
             entity.add(new Renderable(ResourceManager.getSprite("images/drone.png")));
         } else if (type == EnemyType.SERAPH) {
-            entity.add(new EntityController(new EnemyController(2)));
+            entity.add(new EntityController(new EnemyController(2, explosionSpawn)));
             entity.add(new Renderable(ResourceManager.getSprite("images/seraph.png")));
         }
     }

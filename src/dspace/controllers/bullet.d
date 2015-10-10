@@ -16,7 +16,7 @@ class BulletController : Controller
         hasHit = true;
     }
 
-    void update(Entity entity, Game, float delta)
+    void update(Entity entity, Game game, float delta)
     {
         if (hasHit) {
             entity.destroy();
