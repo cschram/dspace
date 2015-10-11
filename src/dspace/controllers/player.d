@@ -31,6 +31,17 @@ class PlayerController : Controller
         bulletSpawner = new BulletSpawner(entities, Direction.UP);
     }
 
+    void reset()
+    {
+        shootCooldownTimer = 0.1;
+        health = 10;
+    }
+
+    uint getHealth()
+    {
+        return health;
+    }
+
     void collide(Entity entity, Entity target)
     {
         health -= 1;

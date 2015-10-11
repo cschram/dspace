@@ -27,6 +27,7 @@ class PlayingState : State
     private RenderWindow       window;
     private Engine             entityEngine;
     private Sprite             background;
+    private Sprite             healthbar;
     private float              backgroundPosition = 1000;
     private Entity             player;
     private AnimationSet       playerAnimSet;
@@ -44,6 +45,7 @@ class PlayingState : State
 
         background = ResourceManager.getSprite("images/background.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
+        healthbar = ResourceManager.getSprite("images/healthbar.png");
 
         createPlayer();
         createSpawners();
@@ -75,6 +77,13 @@ class PlayingState : State
 
     bool enter(string prev)
     {
+        if (prev == "gameover") {
+            entityEngine.entities.clear();
+            createPlayer();
+            foreach (spawner; timedSpawners) {
+                spawner.resetInterval();
+            }
+        }
         return (prev == "startmenu" || prev == "gameover");
     }
 
@@ -107,6 +116,11 @@ class PlayingState : State
         window.clear();
         window.draw(background);
         entityEngine.systems.update!(RenderSystem)(delta);
+
+        auto health = (cast(PlayerController)player.component!EntityController().controller).getHealth();
+        healthbar.textureRect = IntRect(0, 0, 8 * health, 8);
+        window.draw(healthbar);
+
         window.display();
     }
 }

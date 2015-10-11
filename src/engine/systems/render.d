@@ -13,7 +13,7 @@ debug {
     import std.math : round;
     import engine.resourcemgr;
 
-    immutable(Vector2f) debugInfoPosition = Vector2f(0, 0);
+    immutable(Vector2f) debugInfoPosition = Vector2f(0, 10);
 }
 
 class RenderSystem : System

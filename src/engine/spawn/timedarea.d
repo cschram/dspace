@@ -10,6 +10,7 @@ class TimedAreaSpawner : SpawnArea
 {
     static immutable(float) minInterval = 0.05;
 
+    protected float         startInterval;
     protected float         interval;
     protected EntityDetails details;
     private   float         timer = 0;
@@ -17,8 +18,9 @@ class TimedAreaSpawner : SpawnArea
     this(EntityManager entities, FloatRect spawnArea, float pInterval, EntityDetails pDetails)
     {
         super(entities, spawnArea);
-        interval = pInterval;
-        details  = pDetails;
+        startInterval = pInterval;
+        interval      = pInterval;
+        details       = pDetails;
     }
 
     final float getInterval()
@@ -33,6 +35,11 @@ class TimedAreaSpawner : SpawnArea
         } else {
             interval = pInterval;
         }
+    }
+
+    final void resetInterval()
+    {
+        interval = startInterval;
     }
 
     final void update(float delta)
