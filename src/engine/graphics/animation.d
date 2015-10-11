@@ -59,7 +59,7 @@ class Animation : Drawable
         }
     }
 
-    this(string pName, Sprite pSprite, AnimationFrame[] pFrames, Vector2i pSize, bool pLoop, Sound pAudio=null)
+    this(string pName, Sprite pSprite, AnimationFrame[] pFrames, Vector2i pSize, bool pLoop, Sound pAudio=null, bool playImmediately=true)
     {
         name        = pName;
         sprite      = pSprite;
@@ -71,7 +71,7 @@ class Animation : Drawable
         spriteSheet = new SpriteSheet(sprite, size, frame.spriteIndex);
         timeDelta   = 0;
 
-        if (bgAudio !is null) {
+        if (bgAudio !is null && playImmediately) {
             bgAudio.play();
         }
     }

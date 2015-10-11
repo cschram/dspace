@@ -53,8 +53,8 @@ class PlayerController : Controller
             physics.velocity.x = playerSpeed;
             animSet.setAnimation("bank-right");
         } else {
-            physics.velocity.x = 0;
             animSet.setAnimation("idle");
+            physics.velocity.x = 0;
         }
 
         if (shootCooldownTimer <= 0) {
