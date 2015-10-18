@@ -6,9 +6,9 @@ import std.json;
 import dsfml.graphics;
 import dsfml.audio;
 
+import engine.cache;
 import engine.graphics.animation;
 import engine.graphics.animationset;
-import engine.util.cache;
 
 synchronized final abstract class ResourceManager
 {

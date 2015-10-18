@@ -1,8 +1,9 @@
-module engine.util.vector;
+module engine.util;
 
 import std.math;
+import std.random;
 
-import dsfml.system;
+import dsfml.graphics;
 
 float dotProduct(Vector2f a, Vector2f b)
 {
@@ -28,4 +29,20 @@ Vector2f rotateVector90(Vector2f v)
 float projectVector(Vector2f a, Vector2f b)
 {
     return dotProduct(a, vectorUnit(b));
+}
+
+Vector2f getRandomPos(FloatRect area)
+{
+    float left, top;
+    if (area.width <= 0) {
+        left = area.left;
+    } else {
+        left = uniform(area.left, area.left + area.width);
+    }
+    if (area.height <= 0) {
+        top = area.top;
+    } else {
+        top = uniform(area.top, area.top + area.height);
+    }
+    return Vector2f(left, top);
 }

@@ -128,7 +128,7 @@ class QuadTree(T)
 
     T[] retrieve(FloatRect searchArea)
     {
-        T[] found = array(map!(c => c.item)(children));
+        T[] found = map!(c => c.item)(children).array;
         auto i = getIndex(searchArea);
         if (i > -1 && nodes.length > 0) {
             found ~= nodes[i].retrieve(searchArea);

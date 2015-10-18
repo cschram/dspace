@@ -28,7 +28,7 @@ class World : Drawable
         engine.systems.configure();
 
         playerSetup = pPlayerSetup;
-        player = engine.entities.create();
+        player      = engine.entities.create();
         playerSetup(player);
     }
 

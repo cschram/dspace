@@ -1,7 +1,18 @@
 import dspace.dspace;
 
-void main()
+version(unittest)
 {
-    auto game = new DSpace();
-    game.run();
+    void main()
+    {
+        import std.stdio;
+        writeln("Unit tests successful.");
+    }
+}
+else
+{
+    void main()
+    {
+        auto game = new DSpace();
+        game.run();
+    }
 }

@@ -27,7 +27,6 @@ class PlayingState : State
     private Game               game;
     private RenderWindow       window;
     private World              world;
-    private Engine             entityEngine;
     private Sprite             background;
     private Sprite             healthbar;
     private float              backgroundPosition = 1000;
@@ -40,9 +39,9 @@ class PlayingState : State
         window = game.getWindow();
         world  = new World(this, &this.setupPlayer);
 
-        background = ResourceManager.getSprite("images/background.png");
+        background             = ResourceManager.getSprite("images/background.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
-        healthbar = ResourceManager.getSprite("images/healthbar.png");
+        healthbar              = ResourceManager.getSprite("images/healthbar.png");
 
         createPlayer();
         createSpawners();
