@@ -5,6 +5,7 @@ import star.entity;
 
 import engine.game;
 import engine.resourcemgr;
+import engine.world;
 import engine.components.controller;
 import engine.components.physics;
 import engine.components.position;
@@ -25,23 +26,19 @@ class PlayingState : State
 
     private Game               game;
     private RenderWindow       window;
+    private World              world;
     private Engine             entityEngine;
     private Sprite             background;
     private Sprite             healthbar;
     private float              backgroundPosition = 1000;
     private Entity             player;
-    private AnimationSet       playerAnimSet;
     private TimedAreaSpawner[] timedSpawners;
 
     this(Game pGame)
     {
-        game         = pGame;
-        window       = game.getWindow();
-        entityEngine = new Engine();
-        entityEngine.systems.add(new ControllerSystem(game));
-        entityEngine.systems.add(new PhysicsSystem(game));
-        entityEngine.systems.add(new RenderSystem(game));
-        entityEngine.systems.configure();
+        game   = pGame;
+        window = game.getWindow();
+        world  = new World(this, &this.setupPlayer);
 
         background = ResourceManager.getSprite("images/background.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
@@ -51,11 +48,8 @@ class PlayingState : State
         createSpawners();
     }
 
-    void createPlayer()
+    void setupPlayer(Entity player)
     {
-        player        = entityEngine.entities.create();
-        playerAnimSet = AnimationSet.loadFromFile("anim/player.animset");
-
         player.add(new Physics(Vector2f(55, 61),
                                Vector2f(0, 0),
                                Vector2f(0, 0),
@@ -64,7 +58,7 @@ class PlayingState : State
                                CollisionGroup.BOTH,
                                true));
         player.add(new Position(172.5, 539));
-        player.add(new Renderable(playerAnimSet));
+        player.add(new Renderable(AnimationSet.loadFromFile("anim/player.animset")));
         player.add(new EntityController(new PlayerController(entityEngine.entities)));
     }
 

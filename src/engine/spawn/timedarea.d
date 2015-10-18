@@ -46,7 +46,7 @@ class TimedAreaSpawner : SpawnArea
     {
         timer += delta;
         if (timer >= interval) {
-            spawn(details);
+            spawn(entities, details);
             timer = 0;
         }
     }

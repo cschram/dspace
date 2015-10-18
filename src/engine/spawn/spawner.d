@@ -14,20 +14,13 @@ struct EntityDetails
 
 class Spawner
 {
-    private EntityManager entities;
-
-    this(EntityManager pEntities)
-    {
-        entities = pEntities;
-    }
-
     protected void configureEntity(Entity entity, EntityDetails details)
     {
         entity.add(new Physics(Vector2f(0, 0), Vector2f(0, 0), details.velocity));
         entity.add(new Position(details.position));
     }
 
-    final Entity spawn(EntityDetails details)
+    final Entity spawn(EntityManager entities, EntityDetails details)
     {
         auto entity = entities.create();
         configureEntity(entity, details);
