@@ -1,18 +1,21 @@
+import etc.linux.memoryerror;
+
 import dspace.dspace;
 
-version(unittest)
-{
-    void main()
-    {
-        import std.stdio;
-        writeln("Unit tests successful.");
+shared static this() {
+    static if (is(typeof(registerMemoryErrorHandler))) {
+        registerMemoryErrorHandler();
     }
 }
-else
+
+void main()
 {
-    void main()
-    {
-        auto game = new DSpace();
-        game.run();
+    version(unittest) {
+        import std.stdio;
+        writeln("Unit tests successful.");
+        return;
     }
+
+    auto game = new DSpace();
+    game.run();
 }

@@ -1,5 +1,9 @@
 module dspace.controllers.spawnzone;
 
+import std.algorithm;
+import std.array;
+import std.random;
+
 import dsfml.graphics;
 import star.entity;
 
@@ -8,22 +12,22 @@ import engine.spawner;
 import engine.util;
 import engine.world;
 
+struct SpawnOption
+{
+    string name;
+    float  rate;
+    VarMap options;
+}
+
 class SpawnZone : Controller
 {
-    private string    name;
-    private FloatRect bounds;
-    private float     startInterval;
-    private float     interval;
-    private float     timer = 0;
-    private World     world;
-
-    this(string _name, FloatRect _bounds, float _interval, World _world)
+    this(FloatRect _area, float _interval, SpawnOption[] _options)
     {
-        name          = _name;
-        bounds        = _bounds;
-        startInterval = _interval;
-        interval      = _interval;
-        world         = _world;
+        area       = _area;
+        interval   = _interval;
+        options    = _options;
+        timer      = 0;
+        spawnRates = map!(option => option.rate)(_options).array;
     }
 
     void collide(Entity entity, Entity target) { }
@@ -36,4 +40,11 @@ class SpawnZone : Controller
             timer = 0;
         }
     }
+
+private:
+    FloatRect     area;
+    float         interval;
+    SpawnOption[] options;
+    float[]       spawnRates;
+    float         timer;
 }

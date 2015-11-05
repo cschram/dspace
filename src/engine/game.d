@@ -5,6 +5,7 @@ debug import std.stdio;
 import dsfml.graphics;
 
 import engine.resourcemgr;
+import engine.world;
 import engine.states.idle;
 import engine.states.manager;
 
@@ -22,6 +23,7 @@ abstract class Game
     //
     protected StateManager stateMgr;
     protected RenderWindow window;
+    protected World        world;
 
     this()
     {
@@ -60,6 +62,23 @@ abstract class Game
     final RenderWindow getWindow()
     {
         return window;
+    }
+
+    final World createWorld(PlayerSetup setup)
+    {
+        world = new World(this, setup);
+        return world;
+    }
+
+    final World getWorld()
+    {
+        return world;
+    }
+
+    final void destroyWorld()
+    {
+        delete world;
+        world = null;
     }
 
     final bool setState(string state)

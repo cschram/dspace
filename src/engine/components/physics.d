@@ -57,6 +57,17 @@ class Physics
         keepInWindow   = pKeepInWindow;
     }
 
+    this(Physics target)
+    {
+        size           = target.size;
+        offset         = target.offset;
+        velocity       = target.velocity;
+        collisionMode  = target.collisionMode;
+        collisionGroup = target.collisionGroup;
+        collideWith    = target.collideWith;
+        keepInWindow   = target.keepInWindow;
+    }
+
     FloatRect getBounds(Vector2f position)
     {
         return FloatRect(position + offset, size);

@@ -26,18 +26,17 @@ class PlayingState : State
 
     private Game               game;
     private RenderWindow       window;
-    private World              world;
     private Sprite             background;
     private Sprite             healthbar;
     private float              backgroundPosition = 1000;
     private Entity             player;
     private TimedAreaSpawner[] timedSpawners;
 
-    this(Game pGame)
+    this(Game _game)
     {
-        game   = pGame;
+        game   = _game;
         window = game.getWindow();
-        world  = new World(this, &this.setupPlayer);
+        createWorld(&this.setupPlayer);
 
         background             = ResourceManager.getSprite("images/background.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);

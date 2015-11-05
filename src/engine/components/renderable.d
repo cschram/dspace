@@ -28,4 +28,14 @@ class Renderable
         target  = pAnimSet;
         animSet = pAnimSet;
     }
+
+    this(Renderable pTarget)
+    {
+        target = pTarget.target;
+        if (pTarget.anim !is null) {
+            anim = pTarget.anim;
+        } else if (pTarget.animSet !is null) {
+            animSet = pTarget.animSet;
+        }
+    }
 }

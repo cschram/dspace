@@ -5,6 +5,17 @@ import std.random;
 
 import dsfml.graphics;
 
+T[string] combineMap(T, D)(T[D][] args)
+{
+    T[D] result;
+    foreach (map; args) {
+        foreach (D key, T val; map) {
+            result[key] = val;
+        }
+    }
+    return result;
+}
+
 float dotProduct(Vector2f a, Vector2f b)
 {
     return (a.x * b.x) + (a.y * b.y);
