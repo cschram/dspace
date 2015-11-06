@@ -5,6 +5,14 @@ import std.random;
 
 import dsfml.graphics;
 
+enum Direction
+{
+    UP     = 0,
+    LEFT   = 1,
+    DOWN   = 2,
+    RIGHT  = 3
+}
+
 T[string] combineMap(T, D)(T[D][] args)
 {
     T[D] result;
@@ -14,32 +22,6 @@ T[string] combineMap(T, D)(T[D][] args)
         }
     }
     return result;
-}
-
-float dotProduct(Vector2f a, Vector2f b)
-{
-    return (a.x * b.x) + (a.y * b.y);
-}
-
-float vectorLength(Vector2f v)
-{
-    return sqrt(dotProduct(v, v));
-}
-
-Vector2f vectorUnit(Vector2f v)
-{
-    auto len = vectorLength(v);
-    return Vector2f(v.x / len, v.y / len);
-}
-
-Vector2f rotateVector90(Vector2f v)
-{
-    return Vector2f(-v.y, v.x);
-}
-
-float projectVector(Vector2f a, Vector2f b)
-{
-    return dotProduct(a, vectorUnit(b));
 }
 
 Vector2f getRandomPos(FloatRect area)
@@ -56,4 +38,14 @@ Vector2f getRandomPos(FloatRect area)
         top = uniform(area.top, area.top + area.height);
     }
     return Vector2f(left, top);
+}
+
+float degToRad(float d)
+{
+    return d * (PI / 180);
+}
+
+float radToDeg(float r)
+{
+    return r * (180 / PI);
 }
