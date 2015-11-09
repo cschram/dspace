@@ -1,76 +1,49 @@
 module engine.world;
 
+import std.variant;
+
 import dsfml.graphics;
 import star.entity;
 
 import engine.util;
-import engine.components.physics;
 import engine.components.position;
-import engine.components.renderable;
 import engine.systems.controller;
 import engine.systems.physics;
 import engine.systems.render;
 
-alias PlayerSetup = void delegate(Entity);
-alias VarMap      = Variant[string];
-alias PostSpawn   = void delegate(Entity, VarMap);
-
-struct EntityTemplate
-{
-    Physics    physics;
-    Renderable renderable;
-    VarMap     defaultOptions;
-    PostSpawn  callback;
-}
-
-struct SpawnParams
-{
-    Vector2f position;
-    Vector2f velocity;
-    VarMap   options;
-}
+alias EntityAssembly = Entity delegate(Entity, Variant[string]);
 
 class World : Drawable
 {
-    // NOTE: This could potentially be set to another instance of World. Possibly not
-    // ideal, but likely shouldn't break anything.
     Drawable background;
 
-    this(Game game)
+    this(EntityAssembly[string] _assemblies)
     {
+        assemblies = _assemblies;
+
         engine = new Engine();
-        engine.systems.add(new ControllerSystem(game));
-        engine.systems.add(new PhysicsSystem(game));
-        engine.systems.add(new RenderSystem(game));
+        engine.systems.add(new ControllerSystem(this));
+        engine.systems.add(new PhysicsSystem(this));
+        engine.systems.add(new RenderSystem(this));
         engine.systems.configure();
     }
 
-    void reset() { engine.entities.clear(); }
+    void empty() { engine.entities.clear(); }
 
-    void addEntityTemplate(string name, EntityTemplate tpl) { entityTemplates[name] = tpl; }
+    @property float delta() { return currentDelta; }
 
-    Entity spawn(string name, SpawnParams params)
-    in
-    {
-        assert(name in entityTemplates);
-    }
-    body
+    Entity spawn(string factoryName, Vector2f position, Variant[string] options=[])
     {
         auto entity = engine.entities.create();
-        setupEntity(entity, params, entityTemplates[name]);
-        return entity;
+        entity.add(new Position(position));
+        return factories[factoryName](entity, options);
     }
 
-    Entity spawn(string name, Vector2f position, Vector2f velocity=Vector2f(0,0))
+    void update(float d)
     {
-        return spawn(name, SpawnParams(position, velocity));
-    }
-
-    void update(float delta)
-    {
-        currentDelta = delta;
-        entityEngine.systems.update!(PhysicsSystem)(delta);
-        entityEngine.systems.update!(ControllerSystem)(delta);
+        currentDelta = d;
+        entityEngine.systems.update!(PhysicsSystem)(d);
+        entityEngine.systems.update!(ControllerSystem)(d);
     }
 
     override void draw(RenderTarget target, RenderStates renderStates)
@@ -80,21 +53,7 @@ class World : Drawable
     }
 
 private:
-    Engine                 engine;
-    EntityTemplate[string] entityTemplates;
-    float                  currentDelta;
-
-    void setupEntity(Entity entity, SpawnParams params, EntityTemplate tpl)
-    {
-        auto physics = new Physics(tpl.physics);
-        physics.velocity = params.velocity;
-        entity.add(physics);
-        entity.add(new Position(params.position));
-        if (tpl.renderable !is null) {
-            entity.add(new Renderable(tpl.renderable));
-        }
-        if (tpl.callback !is null) {
-            tpl.callback(entity, combineMap(tpl.defaultOptions, params.options));
-        }
-    }
+    Engine engine;
+    EntityAssembly[string] assemblies;
+    float currentDelta;
 }

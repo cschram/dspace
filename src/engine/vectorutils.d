@@ -75,11 +75,15 @@ unittest
     assert(vectorDirection(Vector2f(-0.5, 1))  == Direction.DOWN);
     assert(vectorDirection(Vector2f(1, 1))     == Direction.DOWN);
 
-    assert(dotProduct(Vector2f(1, 2), Vector2f(3, 4)) == 11);
+    assert(dot(Vector2f(1, 2), Vector2f(3, 4)) == 11);
 
     assert(length(Vector2f(3, 4)) == 5);
 
     assert(unit(Vector2f(3, 4)) == Vector2f(3.0 / 5.0, 4.0 / 5.0));
 
+    assert(rotate(Vector2f(1, 0), PI) == Vector2f(-1, 0));
 
+    assert(rotate90(Vector2f(1, 2)) == Vector2f(-2, 1));
+
+    assert(project(Vector2f(1, 1), Vector2f(3, 4)) == Vector2f(3.0 / 5.0, 4.0 / 5.0));
 }

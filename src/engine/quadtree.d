@@ -1,69 +1,19 @@
 module engine.quadtree;
 
-import std.stdio;
 import std.algorithm;
-import std.array;
+import std.range;
 
 import dsfml.graphics;
 
 class QuadTree(T)
 {
-    struct Child
+    this(FloatRect _bounds, int _level=0)
     {
-        FloatRect bounds;
-        T         item;
+        bounds = _bounds;
+        level = _level;
     }
 
-    private static immutable(int) maxChildren = 10;
-    private static immutable(int) maxLevels   = 5;
-
-    private FloatRect  bounds;
-    private int        level;
-    private Child[]    children;
-    private QuadTree[] nodes;
-
-    this(FloatRect pBounds, int pLevel=0)
-    {
-        bounds = pBounds;
-        level  = pLevel;
-    }
-
-    // Determine which subtree to place an object in.
-    // If -1 is returned then it can't fit in any and belongs in the parent.
-    private int getIndex(FloatRect eBounds) const
-    {
-        auto index = -1;
-        // Vertical mid point
-        auto vMid = bounds.left + (bounds.width / 2);
-        // Horizontal mid point
-        auto hMid = bounds.top + (bounds.height / 2);
-        // Can fit entirely in the top quadrants
-        auto topQuad = (eBounds.top < hMid && (eBounds.top + eBounds.height) < hMid);
-        // Can fit entirely in the bottom quadrants
-        auto bottomQuad = (eBounds.top > hMid);
-        // Can fit entirely in the left quadrants
-        auto leftQuad = (eBounds.left < vMid && (eBounds.left + eBounds.width) < vMid);
-        // Can fit entirely in the right quadrants
-        auto rightQuad = (eBounds.left > vMid);
-
-        if (topQuad) {
-            if (leftQuad) {
-                index = 0;
-            } else if (rightQuad) {
-                index = 1;
-            }
-        } else if (bottomQuad) {
-            if (leftQuad) {
-                index = 2;
-            } else if (rightQuad) {
-                index = 3;
-            }
-        }
-
-        return index;
-    }
-
-    void clear()
+    void clear() nothrow @safe
     {
         children = [];
         if (nodes.length > 0) {
@@ -74,7 +24,7 @@ class QuadTree(T)
         }
     }
 
-    void split()
+    void split() nothrow @safe
     {
         auto x = bounds.left;
         auto y = bounds.left;
@@ -93,7 +43,7 @@ class QuadTree(T)
         ];
     }
 
-    void insert(FloatRect itemBounds, T item)
+    void insert(FloatRect itemBounds, T item) nothrow @safe
     {
         if (nodes.length > 0) {
             auto i = getIndex(itemBounds);
@@ -126,13 +76,64 @@ class QuadTree(T)
         }
     }
 
-    T[] retrieve(FloatRect searchArea)
+    auto retrieve(FloatRect searchArea) const nothrow @safe
     {
-        T[] found = map!(c => c.item)(children).array;
+        auto inNode = map!(c => c.item)(children);
         auto i = getIndex(searchArea);
-        if (i > -1 && nodes.length > 0) {
-            found ~= nodes[i].retrieve(searchArea);
+        if (i > -1 && quads.length > 0) {
+            return chain(inNode, quads[i].retrieve(searchArea));
+        } else {
+            return inNode;
         }
-        return found;
+    }
+
+private:
+    struct Child
+    {
+        FloatRect bounds;
+        T item;
+    }
+
+    immutable(int) maxChildren = 10;
+    immutable(int) maxLevels = 5;
+
+    FloatRect bounds;
+    int level;
+    Child[] children;
+    QuadTree[] quads;
+
+    // Determine which subtree to place an object in.
+    // If -1 is returned then it can't fit in any and belongs in the parent.
+    int getIndex(FloatRect eBounds) const nothrow @safe
+    {
+        auto index = -1;
+        // Vertical mid point
+        auto vMid = bounds.left + (bounds.width / 2);
+        // Horizontal mid point
+        auto hMid = bounds.top + (bounds.height / 2);
+        // Can fit entirely in the top quadrants
+        auto topQuad = (eBounds.top < hMid && (eBounds.top + eBounds.height) < hMid);
+        // Can fit entirely in the bottom quadrants
+        auto bottomQuad = (eBounds.top > hMid);
+        // Can fit entirely in the left quadrants
+        auto leftQuad = (eBounds.left < vMid && (eBounds.left + eBounds.width) < vMid);
+        // Can fit entirely in the right quadrants
+        auto rightQuad = (eBounds.left > vMid);
+
+        if (topQuad) {
+            if (leftQuad) {
+                index = 0;
+            } else if (rightQuad) {
+                index = 1;
+            }
+        } else if (bottomQuad) {
+            if (leftQuad) {
+                index = 2;
+            } else if (rightQuad) {
+                index = 3;
+            }
+        }
+
+        return index;
     }
 }

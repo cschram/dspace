@@ -5,26 +5,21 @@ import star.entity;
 
 enum CollisionMode
 {
-    NONE    = 0,
-    LITE    = 1,
-    PASSIVE = 2,
-    ACTIVE  = 3,
-    FIXED   = 4
+    NONE,
+    LITE,
+    PASSIVE,
+    ACTIVE,
+    FIXED
 }
 
 enum CollisionGroup
 {
-    A    = 0,
-    B    = 1,
-    BOTH = 2
+    A,
+    B,
+    BOTH
 }
 
-struct Collision
-{
-    Entity a;
-    Entity b;
-}
-
+// NOTE: This should probably be split up into two or more components.
 class Physics
 {
     Vector2f       size;
@@ -33,39 +28,39 @@ class Physics
     CollisionMode  collisionMode;
     CollisionGroup collisionGroup;
     CollisionGroup collideWith;
-    bool           keepInWindow;
+    bool           keepInWindow; //  NOTE: This should definitely go in favor of a Controller-based approach.
 
     invariant
     {
         assert(collisionGroup != CollisionGroup.BOTH);
     }
 
-    this(Vector2f       pSize,
-         Vector2f       pOffset=Vector2f(0,0),
-         Vector2f       pVelocity=Vector2f(0,0),
-         CollisionMode  pCollisionMode=CollisionMode.PASSIVE,
-         CollisionGroup pCollisionGroup=CollisionGroup.A,
-         CollisionGroup pCollideWith=CollisionGroup.BOTH,
-         bool           pKeepInWindow=false)
+    this(Vector2f _size,
+         Vector2f _offset=Vector2f(0,0),
+         Vector2f _velocity=Vector2f(0,0),
+         CollisionMode _collisionMode=CollisionMode.PASSIVE,
+         CollisionGroup _collisionGroup=CollisionGroup.A,
+         CollisionGroup _collideWith=CollisionGroup.BOTH,
+         bool _keepInWindow=false)
     {
-        size           = pSize;
-        velocity       = pVelocity;
-        offset         = pOffset;
-        collisionMode  = pCollisionMode;
-        collisionGroup = pCollisionGroup;
-        collideWith    = pCollideWith;
-        keepInWindow   = pKeepInWindow;
+        size = _size;
+        velocity = _velocity;
+        offset = _offset;
+        collisionMode = _collisionMode;
+        collisionGroup = _collisionGroup;
+        collideWith = _collideWith;
+        keepInWindow = _keepInWindow;
     }
 
     this(Physics target)
     {
-        size           = target.size;
-        offset         = target.offset;
-        velocity       = target.velocity;
-        collisionMode  = target.collisionMode;
+        size = target.size;
+        offset = target.offset;
+        velocity = target.velocity;
+        collisionMode = target.collisionMode;
         collisionGroup = target.collisionGroup;
-        collideWith    = target.collideWith;
-        keepInWindow   = target.keepInWindow;
+        collideWith = target.collideWith;
+        keepInWindow = target.keepInWindow;
     }
 
     FloatRect getBounds(Vector2f position)

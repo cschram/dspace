@@ -7,21 +7,10 @@ import dsfml.graphics;
 
 enum Direction
 {
-    UP     = 0,
-    LEFT   = 1,
-    DOWN   = 2,
-    RIGHT  = 3
-}
-
-T[string] combineMap(T, D)(T[D][] args)
-{
-    T[D] result;
-    foreach (map; args) {
-        foreach (D key, T val; map) {
-            result[key] = val;
-        }
-    }
-    return result;
+    UP,
+    LEFT,
+    DOWN,
+    RIGHT
 }
 
 Vector2f getRandomPos(FloatRect area)
