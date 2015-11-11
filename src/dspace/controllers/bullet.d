@@ -3,8 +3,8 @@ module dspace.controllers.bullet;
 import dsfml.graphics;
 import star.entity;
 
-import engine.game;
 import engine.controller;
+import engine.world;
 import engine.components.position;
 
 class BulletController : Controller
@@ -16,7 +16,7 @@ class BulletController : Controller
         hasHit = true;
     }
 
-    void update(Entity entity, Game game, float delta)
+    void update(Entity entity, World world)
     {
         if (hasHit) {
             entity.destroy();

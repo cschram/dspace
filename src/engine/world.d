@@ -30,8 +30,6 @@ class World : Drawable
 
     void empty() { engine.entities.clear(); }
 
-    @property float delta() { return currentDelta; }
-
     Entity spawn(string factoryName, Vector2f position, Variant[string] options=[])
     {
         auto entity = engine.entities.create();
@@ -39,11 +37,11 @@ class World : Drawable
         return factories[factoryName](entity, options);
     }
 
-    void update(float d)
+    void update(float delta)
     {
-        currentDelta = d;
-        entityEngine.systems.update!(PhysicsSystem)(d);
-        entityEngine.systems.update!(ControllerSystem)(d);
+        currentDelta = delta;
+        entityEngine.systems.update!(PhysicsSystem)(delta);
+        entityEngine.systems.update!(ControllerSystem)(delta);
     }
 
     override void draw(RenderTarget target, RenderStates renderStates)

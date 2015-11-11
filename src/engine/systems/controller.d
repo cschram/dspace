@@ -2,16 +2,16 @@ module engine.systems.controller;
 
 import star.entity;
 
-import engine.game;
+import engine.world;
 import engine.components.controller;
 
 class ControllerSystem : System
 {
-    protected Game game;
+    protected World world;
 
-    this(Game pGame)
+    this(World _world)
     {
-        game = pGame;
+        world = _world;
     }
 
     void configure(EventManager events) { }
@@ -20,7 +20,7 @@ class ControllerSystem : System
     {
         foreach (entity; entities.entities!(EntityController)()) {
             auto controller = entity.component!(EntityController)().controller;
-            controller.update(entity, game, delta);
+            controller.update(entity, world, delta);
         }
     }
 }
