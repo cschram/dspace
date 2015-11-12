@@ -20,51 +20,19 @@ import dspace.controllers.enemy;
 import dspace.controllers.player;
 import dspace.spawners.enemy;
 
+enum SCROLL_SPEED = 30.0f;
+
 class PlayingState : State
 {
-    private static immutable(float) scrollSpeed = 30;
-
-    private Game               game;
-    private RenderWindow       window;
-    private Sprite             background;
-    private Sprite             healthbar;
-    private float              backgroundPosition = 1000;
-    private Entity             player;
-    private TimedAreaSpawner[] timedSpawners;
-
     this(Game _game)
     {
         game   = _game;
         window = game.getWindow();
         createWorld(&this.setupPlayer);
 
-        background             = ResourceManager.getSprite("images/background.png");
+        background = ResourceManager.getSprite("images/background.png");
         background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
-        healthbar              = ResourceManager.getSprite("images/healthbar.png");
-
-        createPlayer();
-        createSpawners();
-    }
-
-    void setupPlayer(Entity player)
-    {
-        player.add(new Physics(Vector2f(55, 61),
-                               Vector2f(0, 0),
-                               Vector2f(0, 0),
-                               CollisionMode.PASSIVE,
-                               CollisionGroup.A,
-                               CollisionGroup.BOTH,
-                               true));
-        player.add(new Position(172.5, 539));
-        player.add(new Renderable(AnimationSet.loadFromFile("anim/player.animset")));
-        player.add(new EntityController(new PlayerController(entityEngine.entities)));
-    }
-
-    void createSpawners()
-    {
-        auto spawnArea = FloatRect(0, -20, window.getSize().x, 0);
-        timedSpawners ~= new EnemySpawner(entityEngine.entities, EnemyType.DRONE,  spawnArea);
-        timedSpawners ~= new EnemySpawner(entityEngine.entities, EnemyType.SERAPH, spawnArea);
+        healthbar = ResourceManager.getSprite("images/healthbar.png");
     }
 
     bool enter(string prev)
@@ -89,7 +57,7 @@ class PlayingState : State
     void update(float delta)
     {
         if (backgroundPosition > 0) {
-            backgroundPosition -= scrollSpeed * delta;
+            backgroundPosition -= SCROLL_SPEED * delta;
             backgroundPosition = (backgroundPosition > 0) ? backgroundPosition : 0;
             background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
         }
@@ -115,4 +83,13 @@ class PlayingState : State
 
         window.display();
     }
+
+private:
+    Game game;
+    RenderWindow window;
+    Sprite background;
+    Sprite healthbar;
+    float backgroundPosition = 1000;
+    Entity player;
+    TimedAreaSpawner[] timedSpawners;
 }

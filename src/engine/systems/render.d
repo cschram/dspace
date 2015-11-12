@@ -3,7 +3,6 @@ module engine.systems.render;
 import dsfml.graphics;
 import star.entity;
 
-import engine.game;
 import engine.components.position;
 import engine.components.renderable;
 
@@ -26,9 +25,9 @@ class RenderSystem : System
         private Text  objectsText;
     }
 
-    this(Game game)
+    this(RenderWindow _window)
     {
-        window = game.getWindow();
+        window = _window;
 
         debug {
             auto font = ResourceManager.getFont("fonts/OpenSans-Regular.ttf");

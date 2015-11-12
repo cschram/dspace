@@ -5,7 +5,7 @@ debug import std.stdio;
 import dsfml.graphics;
 import star.entity;
 
-import engine.game;
+import engine.configmgr;
 import engine.quadtree;
 import engine.components.controller;
 import engine.components.physics;
@@ -13,14 +13,11 @@ import engine.components.position;
 
 class PhysicsSystem : System
 {
-    private RenderWindow    window;
-    private QuadTree!Entity tree;
-
-    this(Game game)
+    this()
     {
-        window = game.getWindow();
-        auto size = window.getSize();
-        tree = new QuadTree!Entity(FloatRect(0, 0, size.x, size.y));
+        auto videoMode = ConfigManager.get().videoMode;
+        windowSize = Vector2f(videoMode.width, videoMode.height);
+        tree = new QuadTree!Entity(FloatRect(0, 0, windowSize.x, windowSize.y));
     }
 
     void configure(EventManager events) { }
@@ -34,7 +31,7 @@ class PhysicsSystem : System
             position.position += physics.velocity * delta;
 
             if (physics.keepInWindow) {
-                auto container = window.getSize() - physics.size + physics.offset;
+                auto container = windowSize - physics.size + physics.offset;
                 if (position.position.x < 0) {
                     position.position.x = 0;
                 } else if (position.position.x > container.x) {
@@ -98,4 +95,8 @@ class PhysicsSystem : System
         moveEntities(entities, delta);
         checkCollisions(entities);
     }
+
+private:
+    Vector2f windowSize;
+    QuadTree!Entity tree;
 }

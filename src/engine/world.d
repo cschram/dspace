@@ -17,14 +17,14 @@ class World : Drawable
 {
     Drawable background;
 
-    this(EntityAssembly[string] _assemblies)
+    this(RenderWindow _window, EntityAssembly[string] _assemblies)
     {
         assemblies = _assemblies;
 
         engine = new Engine();
         engine.systems.add(new ControllerSystem(this));
-        engine.systems.add(new PhysicsSystem(this));
-        engine.systems.add(new RenderSystem(this));
+        engine.systems.add(new PhysicsSystem());
+        engine.systems.add(new RenderSystem(_window));
         engine.systems.configure();
     }
 
