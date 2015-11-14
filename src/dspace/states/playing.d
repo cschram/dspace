@@ -20,35 +20,31 @@ import dspace.controllers.enemy;
 import dspace.controllers.player;
 import dspace.spawners.enemy;
 
+enum INIT_BG_POS = 1000;
 enum SCROLL_SPEED = 30.0f;
+enum INIT_PLAYER_POS = Vector2f(172.5, 539);
 
 class PlayingState : State
 {
-    this(Game _game)
+    this(Game _game, RenderWindow _window, World _world)
     {
-        game   = _game;
-        window = game.getWindow();
-        createWorld(&this.setupPlayer);
-
-        background = ResourceManager.getSprite("images/background.png");
-        background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
+        game = _game;
+        window = _window;
+        world = _world;
         healthbar = ResourceManager.getSprite("images/healthbar.png");
     }
 
     bool enter(string prev)
     {
-        if (prev == "gameover") {
-            entityEngine.entities.clear();
-            createPlayer();
-            foreach (spawner; timedSpawners) {
-                spawner.resetInterval();
-            }
-        }
+        backgroundPosition = INIT_BG_POS;
+        player = world.spawn("player", INIT_PLAYER_POS);
         return (prev == "startmenu" || prev == "gameover");
     }
 
     bool exit(string next)
     {
+        player = null;
+        world.reset();
         return (next == "gameover");
     }
 
@@ -56,40 +52,30 @@ class PlayingState : State
 
     void update(float delta)
     {
+        auto health = (cast(PlayerController)player.component!EntityController().controller).getHealth();
+        if (health <= 0) {
+            game.setState("gameover");
+            return;
+        }
+
         if (backgroundPosition > 0) {
             backgroundPosition -= SCROLL_SPEED * delta;
             backgroundPosition = (backgroundPosition > 0) ? backgroundPosition : 0;
             background.textureRect = IntRect(0, cast(int)backgroundPosition, 400, 600);
         }
 
-        foreach (spawner; timedSpawners) {
-            spawner.update(delta);
-            auto interval = spawner.getInterval();
-            if (interval > TimedAreaSpawner.minInterval) {
-                spawner.setInterval(interval - (delta / 10));
-            }
-        }
-
-        entityEngine.systems.update!(PhysicsSystem)(delta);
-        entityEngine.systems.update!(ControllerSystem)(delta);
-
         window.clear();
-        window.draw(background);
-        entityEngine.systems.update!(RenderSystem)(delta);
-
-        auto health = (cast(PlayerController)player.component!EntityController().controller).getHealth();
+        window.draw(world);
         healthbar.textureRect = IntRect(0, 0, 8 * health, 8);
         window.draw(healthbar);
-
         window.display();
     }
 
 private:
     Game game;
     RenderWindow window;
-    Sprite background;
+    World world;
     Sprite healthbar;
     float backgroundPosition = 1000;
     Entity player;
-    TimedAreaSpawner[] timedSpawners;
 }

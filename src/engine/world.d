@@ -28,7 +28,7 @@ class World : Drawable
         engine.systems.configure();
     }
 
-    void empty() { engine.entities.clear(); }
+    void reset() { engine.entities.clear(); }
 
     Entity spawn(string factoryName, Vector2f position, Variant[string] options=[])
     {
